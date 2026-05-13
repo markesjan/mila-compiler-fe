@@ -1,0 +1,53 @@
+Mila Lang Grammar (EBNF)
+
+Program    ::= "program" identifier ";" GlobalDecl MainBlock "."
+GlobalDecl ::= { ConstSection | VarSection | ProcFuncDecl }
+MainBlock  ::= CompoundStmt
+
+ConstSection ::= "const" ConstDecl ";" { ConstDecl ";" }
+ConstDecl    ::= identifier "=" number
+VarSection   ::= "var" VarDecl ";" { VarDecl ";" }
+VarDecl      ::= identifier { "," identifier } ":" Type
+Type         ::= "integer" | "boolean" | ArrayType
+ArrayType    ::= "array" "[" number ".." number "]" "of" Type
+
+ProcFuncDecl  ::= ( ProcedureDecl | FunctionDecl ) ";"
+ProcedureDecl ::= "procedure" identifier [ "(" FormalParams ")" ] ";" LocalDecl CompoundStmt
+FunctionDecl  ::= "function" identifier [ "(" FormalParams ")" ] ":" Type ";" LocalDecl CompoundStmt
+
+FormalParams ::= FormalParam { ";" FormalParam }
+FormalParam  ::= identifier { "," identifier } ":" Type
+LocalDecl    ::= { ConstSection | VarSection }
+
+CompoundStmt ::= "begin" Statement { ";" Statement } [ ";" ] "end"
+Statement    ::= identifier ( AssignOrCall )
+               | IfStmt
+               | WhileStmt
+               | ForStmt
+               | CompoundStmt
+               | "break"
+               | "continue"
+               | "exit"
+               | Empty
+
+AssignOrCall ::= [ "[" Expression "]" ] ":=" Expression
+               | [ "(" ActualParams ")" ]
+ActualParams ::= Expression { "," Expression }
+
+IfStmt    ::= "if" Expression "then" Statement [ "else" Statement ]
+WhileStmt ::= "while" Expression "do" Statement
+ForStmt   ::= "for" identifier ":=" Expression ("to" | "downto") Expression "do" Statement
+
+Expression ::= SimpleExpr [ RelOp SimpleExpr ]
+SimpleExpr ::= [ "-" ] Term { AddOp Term }
+Term       ::= Factor { MulOp Factor }
+Factor     ::= identifier [ "[" Expression "]" | "(" ActualParams ")" ]
+             | number
+             | "not" Factor
+             | "(" Expression ")"
+
+RelOp ::= "=" | "<>" | "<" | "<=" | ">" | ">="
+AddOp ::= "+" | "-" | "or" | "xor"
+MulOp ::= "*" | "div" | "mod" | "and"
+
+Empty ::=
