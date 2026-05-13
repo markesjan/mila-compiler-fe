@@ -1,5 +1,4 @@
-#ifndef PJPPROJECT_PARSER_HPP
-#define PJPPROJECT_PARSER_HPP
+#pragma once
 
 #include <llvm/ADT/APFloat.h>
 #include <llvm/ADT/STLExtras.h>
@@ -16,23 +15,25 @@
 
 #include "Lexer.hpp"
 
+namespace milan {
+
 class Parser {
 public:
     Parser();
     ~Parser() = default;
 
-    bool Parse();                    // parse
-    const llvm::Module& Generate();  // generate
+    bool parse();
+    const llvm::Module& generate();
 
 private:
     int getNextToken();
 
-    Lexer m_Lexer;                   // lexer is used to read tokens
-    int CurTok;                      // to keep the current token
+    Lexer lexer;
+    int currTok;
 
-    llvm::LLVMContext MilaContext;   // llvm context
-    llvm::IRBuilder<> MilaBuilder;   // llvm builder
-    llvm::Module MilaModule;         // llvm module
+    llvm::LLVMContext MilaContext;
+    llvm::IRBuilder<> MilaBuilder;
+    llvm::Module MilaModule;
 };
 
-#endif //PJPPROJECT_PARSER_HPP
+} // namespace milan

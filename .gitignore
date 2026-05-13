@@ -1,3 +1,5 @@
 build
 samples/*
 !samples/*.mila
+cmake-build-debug
+.idea

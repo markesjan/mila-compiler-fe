@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4.3)
+cmake_minimum_required(VERSION 3.10)
 project(mila)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -15,10 +15,15 @@ find_package(LLVM REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/)
-add_executable(mila src/main.cpp src/Lexer.hpp src/Lexer.cpp src/Parser.hpp src/Parser.cpp)
+add_executable(mila
+        src/main.cpp
+        src/Lexer.cpp
+        src/Parser.cpp
+)
 
-target_include_directories(mila PRIVATE ${LLVM_INCLUDE_DIRS})
+target_include_directories(mila PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(mila PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(mila SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 target_compile_options(mila PRIVATE ${LLVM_DEFINITIONS_LIST})
@@ -27,6 +32,7 @@ target_compile_options(mila PRIVATE ${LLVM_DEFINITIONS_LIST})
 # https://github.com/llvm/llvm-project/issues/34593
 # llvm_map_components_to_libnames(llvm_libs support core irreader)
 # target_link_libraries(mila ${llvm_libs})
+target_link_libraries(mila PRIVATE stdc++)
 
 llvm_config(mila USE_SHARED support core irreader)
 
@@ -37,15 +43,15 @@ if (BUILD_TESTING)
     file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/tests")
 
     # compile tests
-    foreach(src ${MILA_SOURCES})
+    foreach (src ${MILA_SOURCES})
         get_filename_component(basename ${src} NAME_WE)
         add_test(NAME "compiler:${basename}" COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/mila" "${src}" "-o" "${CMAKE_CURRENT_BINARY_DIR}/tests/${basename}")
         set_tests_properties("compiler:${basename}" PROPERTIES FIXTURES_SETUP "${basename}")
-    endforeach()
+    endforeach ()
 
     # run tests
     file(GLOB MILA_OUTPUTS LIST_DIRECTORIES false CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/tests/run/*.run[0-9]*.out")
-    foreach(out ${MILA_OUTPUTS})
+    foreach (out ${MILA_OUTPUTS})
         get_filename_component(outname ${out} NAME)
         get_filename_component(extensionOut ${out} EXT)
         get_filename_component(basename ${out} NAME_WE)
@@ -54,23 +60,22 @@ if (BUILD_TESTING)
 
         set(executable ${CMAKE_CURRENT_BINARY_DIR}/tests/${basename})
         set(outfile ${CMAKE_CURRENT_SOURCE_DIR}/tests/run/${outname})
-        set(infile  ${CMAKE_CURRENT_SOURCE_DIR}/tests/run/${inname})
+        set(infile ${CMAKE_CURRENT_SOURCE_DIR}/tests/run/${inname})
 
-        if(EXISTS "${infile}")
+        if (EXISTS "${infile}")
             add_test(NAME "run:${outname}" COMMAND
-                ${CMAKE_COMMAND}
-                -D executable=${executable}
-                -D expected=${outfile}
-                -D input=${infile}
-                -P ${CMAKE_CURRENT_SOURCE_DIR}/tests/run_test.cmake)
-        else()
+                    ${CMAKE_COMMAND}
+                    -D executable=${executable}
+                    -D expected=${outfile}
+                    -D input=${infile}
+                    -P ${CMAKE_CURRENT_SOURCE_DIR}/tests/run_test.cmake)
+        else ()
             add_test(NAME "run:${outname}" COMMAND
-                ${CMAKE_COMMAND}
-                -D executable=${executable}
-                -D expected=${outfile}
-                -P ${CMAKE_CURRENT_SOURCE_DIR}/tests/run_test.cmake)
-        endif()
+                    ${CMAKE_COMMAND}
+                    -D executable=${executable}
+                    -D expected=${outfile}
+                    -P ${CMAKE_CURRENT_SOURCE_DIR}/tests/run_test.cmake)
+        endif ()
         set_tests_properties("run:${outname}" PROPERTIES FIXTURES_REQUIRED "${basename}")
-    endforeach()
-endif()
-
+    endforeach ()
+endif ()
