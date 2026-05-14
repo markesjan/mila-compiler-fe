@@ -22,6 +22,10 @@ private:
     int numVal;
     int lastChar = ' ';
 
+    int tokenizeKeyword();
+    int tokenizeNumber();
+    int tokenizeOperator();
+
     inline static const std::unordered_map<std::string, Token> keywords = {
         {"program", tok_program},
         {"begin", tok_begin},

@@ -4,6 +4,7 @@ namespace milan {
 
 enum Token {
     tok_eof = -1,
+    tok_error = -41,
 
     // numbers and identifiers
     tok_identifier = -2,
