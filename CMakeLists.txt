@@ -15,14 +15,19 @@ find_package(LLVM REQUIRED CONFIG)
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
-add_executable(mila
-        src/main.cpp
-        src/Lexer.cpp
-        src/Parser.cpp
-)
+file(GLOB_RECURSE SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cpp")
+file(GLOB_RECURSE HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "include/*.hpp")
 
-target_include_directories(mila PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_executable(mila ${SOURCES} ${HEADERS})
+
+target_include_directories(mila PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ast
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ast/expressions
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ast/statements)
+
 target_include_directories(mila PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
 target_include_directories(mila SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
