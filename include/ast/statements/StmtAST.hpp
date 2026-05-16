@@ -1,17 +1,14 @@
 #pragma once
 
-#include "CodegenContext.hpp"
+#include <memory>
+
+#include "NodeAST.hpp"
 
 namespace milan {
 
-class StmtAST {
+class StmtAST : public NodeAST {
 public:
-    StmtAST(int row, int col);
-    virtual ~StmtAST() = default;
-    virtual llvm::Value* codegen(CodegenContext& ctx) = 0;
-
-private:
-    int row, col;
+    using NodeAST::NodeAST;
 };
 
 using UPtrStmt = std::unique_ptr<StmtAST>;

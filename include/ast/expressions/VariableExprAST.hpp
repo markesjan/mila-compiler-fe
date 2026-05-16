@@ -1,16 +1,18 @@
 #pragma once
 
+#include <string>
+
 #include "ExprAST.hpp"
 
 namespace milan {
 
-class BoolExprAST : public ExprAST {
+class VariableExprAST : public ExprAST {
 public:
-    explicit BoolExprAST(bool val);
+    explicit VariableExprAST(const std::string& name);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:
-    bool val;
+    std::string name;
 };
 
 } // namespace milan

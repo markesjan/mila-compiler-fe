@@ -3,18 +3,16 @@
 #include <memory>
 
 #include "ExprAST.hpp"
-#include "Token.hpp"
 
 namespace milan {
 
-class BinOpExprAST : public ExprAST {
+class ArrayAccessExprAST : public ExprAST {
 public:
-    BinOpExprAST(Token op, UPtrExpr lhs, UPtrExpr rhs);
+    ArrayAccessExprAST(std::size_t idx);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:
-    Token op;
-    UPtrExpr lhs, rhs;
+    std::size_t idx;
 };
 
 } // namespace milan

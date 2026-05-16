@@ -4,13 +4,13 @@
 
 namespace milan {
 
-class NumExprAST : public ExprAST {
+class BooleanExprAST : public ExprAST {
 public:
-    explicit NumExprAST(std::int32_t val);
+    explicit BooleanExprAST(bool val);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:
-     std::int32_t val;
+    bool val;
 };
 
 } // namespace milan
