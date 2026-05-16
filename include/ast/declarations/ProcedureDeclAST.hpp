@@ -11,12 +11,12 @@ namespace milan {
 
 class ProcedureDeclAST : public DeclAST {
 public:
-    explicit ProcedureDeclAST(int row,
-                              int col,
-                              std::string name,
-                              std::vector<UPtrDecl> params,
-                              std::vector<UPtrDecl> localDecls,
-                              UPtrStmt body);
+    ProcedureDeclAST(int row,
+                     int col,
+                     std::string name,
+                     std::vector<UPtrDecl> params,
+                     std::vector<UPtrDecl> localDecls,
+                     UPtrStmt body);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

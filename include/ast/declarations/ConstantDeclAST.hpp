@@ -8,7 +8,7 @@ namespace milan {
 
 class ConstantDeclAST : public DeclAST {
 public:
-    explicit ConstantDeclAST(int row, int col, std::string name, int val);
+    ConstantDeclAST(int row, int col, std::string name, int val);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

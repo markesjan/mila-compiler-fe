@@ -4,18 +4,18 @@
 #include <vector>
 
 #include "DeclAST.hpp"
-#include "Token.hpp"
+#include "Type.hpp"
 
 namespace milan {
 
 class VariableDeclAST : public DeclAST {
 public:
-    explicit VariableDeclAST(int row, int col, std::vector<std::string> names, Token type);
+    VariableDeclAST(int row, int col, std::vector<std::string> names, Type type);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:
     std::vector<std::string> names;
-    Token type;
+    Type type;
 };
 
 } // namespace milan
