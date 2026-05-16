@@ -6,7 +6,7 @@ namespace milan {
 
 class ContinueStmtAST : public StmtAST {
 public:
-    explicit ContinueStmtAST();
+    ContinueStmtAST(int row, int col);
     llvm::Value* codegen(CodegenContext& ctx) override;
 };
 

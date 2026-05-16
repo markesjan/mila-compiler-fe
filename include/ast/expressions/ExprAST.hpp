@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "NodeAST.hpp"
 
 namespace milan {

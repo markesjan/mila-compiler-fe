@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <memory>
 
 #include "ExprAST.hpp"
@@ -8,11 +9,12 @@ namespace milan {
 
 class ArrayAccessExprAST : public ExprAST {
 public:
-    ArrayAccessExprAST(std::size_t idx);
+    ArrayAccessExprAST(int row, int col, std::string name, UPtrExpr idx);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:
-    std::size_t idx;
+    std::string name;
+    UPtrExpr idx;
 };
 
 } // namespace milan

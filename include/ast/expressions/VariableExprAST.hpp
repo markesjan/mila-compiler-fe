@@ -8,7 +8,7 @@ namespace milan {
 
 class VariableExprAST : public ExprAST {
 public:
-    explicit VariableExprAST(const std::string& name);
+    VariableExprAST(int row, int col, std::string name);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

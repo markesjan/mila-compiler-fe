@@ -6,7 +6,7 @@ namespace milan {
 
 class EmptyStmtAST : public StmtAST {
 public:
-    explicit EmptyStmtAST();
+    EmptyStmtAST(int row, int col);
     llvm::Value* codegen(CodegenContext& ctx) override;
 };
 

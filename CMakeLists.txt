@@ -23,6 +23,7 @@ add_executable(mila ${SOURCES} ${HEADERS})
 target_include_directories(mila PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ast
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ast/declarations
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ast/expressions
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ast/statements)
 

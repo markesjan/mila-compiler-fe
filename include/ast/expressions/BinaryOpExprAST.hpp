@@ -9,7 +9,7 @@ namespace milan {
 
 class BinaryOpExprAST : public ExprAST {
 public:
-    BinaryOpExprAST(Token op, UPtrExpr lhs, UPtrExpr rhs);
+    BinaryOpExprAST(int row, int col, Token op, UPtrExpr lhs, UPtrExpr rhs);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

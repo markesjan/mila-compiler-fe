@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
 #include "DeclAST.hpp"
 #include "Token.hpp"
 
@@ -7,7 +10,7 @@ namespace milan {
 
 class VariableDeclAST : public DeclAST {
 public:
-    explicit VariableDeclAST(std::vector<std::string> names, Token type);
+    explicit VariableDeclAST(int row, int col, std::vector<std::string> names, Token type);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

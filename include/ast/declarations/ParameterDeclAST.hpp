@@ -10,7 +10,7 @@ namespace milan {
 
 class ParameterDeclAST : public DeclAST {
 public:
-    explicit ParameterDeclAST(std::vector<std::string> names, Token type);
+    explicit ParameterDeclAST(int row, int col, std::vector<std::string> names, Token type);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

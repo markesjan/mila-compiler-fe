@@ -6,7 +6,7 @@ namespace milan {
 
 class ExitStmtAST : public StmtAST {
 public:
-    explicit ExitStmtAST();
+    ExitStmtAST(int row, int col);
     llvm::Value* codegen(CodegenContext& ctx) override;
 };
 

@@ -1,15 +1,15 @@
 #pragma once
 
-#include "StmtAST.hpp"
-
 #include <vector>
 #include <memory>
+
+#include "StmtAST.hpp"
 
 namespace milan {
 
 class CompoundStmtAST : public StmtAST {
 public:
-    explicit CompoundStmtAST(std::vector<UPtrStmt> stmts);
+    CompoundStmtAST(int row, int col, std::vector<UPtrStmt> stmts);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

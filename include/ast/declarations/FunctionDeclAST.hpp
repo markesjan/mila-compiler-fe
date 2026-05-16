@@ -1,6 +1,8 @@
 #pragma once
+
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "DeclAST.hpp"
 #include "StmtAST.hpp"
@@ -10,7 +12,9 @@ namespace milan {
 
 class FunctionDeclAST : public DeclAST {
 public:
-    explicit FunctionDeclAST(std::string name,
+    explicit FunctionDeclAST(int row,
+                             int col,
+                             std::string name,
                              Token retType,
                              std::vector<UPtrDecl> params,
                              std::vector<UPtrDecl> localDecls,

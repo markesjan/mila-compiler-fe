@@ -6,7 +6,7 @@ namespace milan {
 
 class BreakStmtAST : public StmtAST {
 public:
-    explicit BreakStmtAST();
+    BreakStmtAST(int row, int col);
     llvm::Value* codegen(CodegenContext& ctx) override;
 };
 

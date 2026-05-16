@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+#include <vector>
 #include <memory>
 
 #include "ExprAST.hpp"
@@ -9,7 +11,7 @@ namespace milan {
 
 class CallStmtAST : public StmtAST {
 public:
-    explicit CallStmtAST(std::string name, std::vector<UPtrExpr> args);
+    CallStmtAST(int row, int col, std::string name, std::vector<UPtrExpr> args);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

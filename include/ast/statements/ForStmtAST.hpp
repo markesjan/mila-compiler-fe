@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <memory>
 
 #include "ExprAST.hpp"
@@ -10,11 +11,13 @@ namespace milan {
 
 class ForStmtAST : public StmtAST {
 public:
-    explicit ForStmtAST(std::string name,
-                        UPtrExpr start,
-                        UPtrExpr stop,
-                        Token direction,
-                        UPtrStmt loopStmt);
+    ForStmtAST(int row,
+               int col,
+               std::string name,
+               UPtrExpr start,
+               UPtrExpr stop,
+               Token direction,
+               UPtrStmt loopStmt);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:
