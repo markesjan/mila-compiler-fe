@@ -7,13 +7,13 @@
 
 namespace milan {
 
-class BlockAST : public StmtAST {
+class CompoundStmtAST : public StmtAST {
 public:
-    explicit BlockAST(std::vector<std::unique_ptr<StmtAST>> stmts);
+    explicit CompoundStmtAST(std::vector<UPtrStmt> stmts);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:
-    std::vector<std::unique_ptr<StmtAST>> stmts;
+    std::vector<UPtrStmt> stmts;
 };
 
 } // namespace milan
