@@ -4,6 +4,7 @@
 
 namespace milan {
 
+
 class ExprAST {
 public:
     ExprAST(int row, int col);
@@ -13,5 +14,7 @@ public:
 private:
     int row, col;
 };
+
+using UPtrExpr = std::unique_ptr<ExprAST>;
 
 } // namespace milan

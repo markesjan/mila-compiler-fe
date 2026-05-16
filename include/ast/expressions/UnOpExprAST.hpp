@@ -3,17 +3,18 @@
 #include <memory>
 
 #include "ExprAST.hpp"
+#include "Token.hpp"
 
 namespace milan {
 
 class UnOpExprAST : public ExprAST {
 public:
-    UnOpExprAST(char op, std::unique_ptr<ExprAST> expr);
+    UnOpExprAST(Token op, UPtrExpr expr);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:
-    char op;
-    std::unique_ptr<ExprAST> expr;
+    Token op;
+    UPtrExpr expr;
 };
 
 } // namespace milan
