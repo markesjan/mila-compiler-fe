@@ -38,7 +38,7 @@ llvm::Value* VariableDeclAST::codegen(CodegenContext& ctx) {
         ctx.symbolTable[name] = alloca;
     }
 
-    return nullptr;
+    return llvm::ConstantInt::getTrue(ctx.context);
 }
 
 } // namespace milan

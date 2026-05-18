@@ -13,7 +13,7 @@ llvm::Value* ConstantDeclAST::codegen(CodegenContext& ctx) {
 
     ctx.symbolTable[name] = constVal;
 
-    return nullptr;
+    return llvm::ConstantInt::getTrue(ctx.context);
 }
 
 } // namespace milan
