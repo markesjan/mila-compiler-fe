@@ -1,0 +1,48 @@
+#include "WhileStmtAST.hpp"
+
+#include <llvm/IR/Function.h>
+#include <llvm/IR/Constants.h>
+
+namespace milan {
+
+WhileStmtAST::WhileStmtAST(int row, int col, UPtrExpr cond, UPtrStmt loopStmt)
+    : StmtAST(row, col), cond(std::move(cond)), loopStmt(std::move(loopStmt)) {
+}
+
+llvm::Value* WhileStmtAST::codegen(CodegenContext& ctx) {
+    llvm::Function* callerFunc = ctx.builder.GetInsertBlock()->getParent();
+    llvm::BasicBlock* condBlock = llvm::BasicBlock::Create(ctx.context, "whilecond", callerFunc);
+    llvm::BasicBlock* loopBlock = llvm::BasicBlock::Create(ctx.context, "whileloop");
+    llvm::BasicBlock* afterBlock = llvm::BasicBlock::Create(ctx.context, "whilecont");
+
+    ctx.builder.CreateBr(condBlock);
+    ctx.builder.SetInsertPoint(condBlock);
+
+    llvm::Value* condVal = cond->codegen(ctx);
+    if (!condVal)
+        return nullptr;
+
+    ctx.builder.CreateCondBr(condVal, loopBlock, afterBlock);
+    callerFunc->insert(callerFunc->end(), loopBlock);
+    ctx.builder.SetInsertPoint(loopBlock);
+
+    ctx.loopBreakBlocks.push_back(afterBlock);
+    ctx.loopContinueBlocks.push_back(condBlock);
+
+    if (!loopStmt->codegen(ctx)) {
+        ctx.loopBreakBlocks.pop_back();
+        ctx.loopContinueBlocks.pop_back();
+        return nullptr;
+    }
+
+    ctx.loopBreakBlocks.pop_back();
+    ctx.loopContinueBlocks.pop_back();
+
+    ctx.builder.CreateBr(condBlock);
+    callerFunc->insert(callerFunc->end(), afterBlock);
+    ctx.builder.SetInsertPoint(afterBlock);
+
+    return llvm::ConstantInt::getTrue(ctx.context);
+}
+
+} // namespace milan

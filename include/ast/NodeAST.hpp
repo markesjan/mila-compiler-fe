@@ -1,5 +1,7 @@
 #pragma once
 
+#include <llvm/IR/Value.h>
+
 #include "CodegenContext.hpp"
 
 namespace milan {

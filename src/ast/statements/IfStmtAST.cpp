@@ -1,5 +1,13 @@
 #include "IfStmtAST.hpp"
 
+#include <memory>
+
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Value.h>
+
 namespace milan {
 
 IfStmtAST::IfStmtAST(int row, int col, UPtrExpr cond, UPtrStmt thenStmt, UPtrStmt elseStmt)
