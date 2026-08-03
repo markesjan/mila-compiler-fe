@@ -73,7 +73,7 @@ OutputFileBaseName="${OutputFileName%%.*}"
 
 rm -f "$OutputFileBaseName.ir"
 #echo "DEBUG" "$OutputFileBaseName.ir" "$InputFileName" "${DIR}/build/mila"
-> "$OutputFileBaseName.ir" < "$InputFileName" "${DIR}/build/mila" &&
+> "$OutputFileBaseName.ir" < "$InputFileName" "${DIR}/cmake-build-debug/mila" &&
 rm -f "$OutputFileBaseName.s"
-llc "$OutputFileBaseName.ir" -o "$OutputFileBaseName.s" -relocation-model=pic &&
-clang "$OutputFileBaseName.s" "${DIR}/src/fce.c" -o "$OutputFileName"
+llc-18 "$OutputFileBaseName.ir" -o "$OutputFileBaseName.s" -relocation-model=pic &&
+clang-18 "$OutputFileBaseName.s" "${DIR}/src/fce.c" -o "$OutputFileName"
