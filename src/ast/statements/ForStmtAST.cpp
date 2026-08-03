@@ -1,7 +1,7 @@
 #include "ForStmtAST.hpp"
 
-#include <llvm/IR/Function.h>
 #include <llvm/IR/Constants.h>
+#include <llvm/IR/Function.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Type.h>
 
@@ -14,9 +14,12 @@ ForStmtAST::ForStmtAST(int row,
                        UPtrExpr stop,
                        Token direction,
                        UPtrStmt loopStmt)
-    : StmtAST(row, col), name(std::move(name)), start(std::move(start)), stop(std::move(stop)),
-      direction(direction), loopStmt(std::move(loopStmt)) {
-}
+    : StmtAST(row, col),
+      name(std::move(name)),
+      start(std::move(start)),
+      stop(std::move(stop)),
+      direction(direction),
+      loopStmt(std::move(loopStmt)) {}
 
 llvm::Value* ForStmtAST::codegen(CodegenContext& ctx) {
     llvm::Value* varAllocaRaw = ctx.symbolTable[name];
@@ -41,8 +44,8 @@ llvm::Value* ForStmtAST::codegen(CodegenContext& ctx) {
     ctx.builder.CreateBr(condBlock);
     ctx.builder.SetInsertPoint(condBlock);
 
-    llvm::Value* currVal = ctx.builder.CreateLoad(
-        varAlloca->getAllocatedType(), varAlloca, name.c_str());
+    llvm::Value* currVal =
+        ctx.builder.CreateLoad(varAlloca->getAllocatedType(), varAlloca, name.c_str());
     llvm::Value* condResult = nullptr;
     if (direction == tok_to)
         condResult = ctx.builder.CreateICmpSLE(currVal, stopVal, "tocond");
@@ -73,8 +76,8 @@ llvm::Value* ForStmtAST::codegen(CodegenContext& ctx) {
     callerFunc->insert(callerFunc->end(), stepBlock);
     ctx.builder.SetInsertPoint(stepBlock);
 
-    llvm::Value* stepLoad = ctx.builder.CreateLoad(
-        varAlloca->getAllocatedType(), varAlloca, "stepload");
+    llvm::Value* stepLoad =
+        ctx.builder.CreateLoad(varAlloca->getAllocatedType(), varAlloca, "stepload");
     llvm::Value* one = llvm::ConstantInt::get(llvm::Type::getInt32Ty(ctx.context), 1);
     llvm::Value* nextVal = nullptr;
 

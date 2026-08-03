@@ -2,9 +2,7 @@
 
 namespace milan {
 
-Type::Type(BaseType base)
-    : base(base), isArray(false), low(0), high(0) {
-}
+Type::Type(BaseType base) : base(base), isArray(false), low(0), high(0) {}
 
 Type Type::createArray(int low, int high, BaseType elementBase) {
     Type t(elementBase);

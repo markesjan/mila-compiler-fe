@@ -3,8 +3,7 @@
 namespace milan {
 
 ConstantDeclAST::ConstantDeclAST(int row, int col, std::string name, UPtrExpr val)
-    : DeclAST(row, col), name(std::move(name)), val(std::move(val)) {
-}
+    : DeclAST(row, col), name(std::move(name)), val(std::move(val)) {}
 
 llvm::Value* ConstantDeclAST::codegen(CodegenContext& ctx) {
     llvm::Value* constVal = val->codegen(ctx);

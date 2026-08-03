@@ -3,8 +3,7 @@
 namespace milan {
 
 UnaryOpExprAST::UnaryOpExprAST(int row, int col, Token op, UPtrExpr expr)
-    : ExprAST(row, col), op(op), expr(std::move(expr)) {
-}
+    : ExprAST(row, col), op(op), expr(std::move(expr)) {}
 
 llvm::Value* UnaryOpExprAST::codegen(CodegenContext& ctx) {
     llvm::Value* operandVal = expr->codegen(ctx);

@@ -5,8 +5,7 @@
 namespace milan {
 
 VariableExprAST::VariableExprAST(int row, int col, std::string name)
-    : ExprAST(row, col), name(std::move(name)) {
-}
+    : ExprAST(row, col), name(std::move(name)) {}
 
 llvm::Value* VariableExprAST::codegen(CodegenContext& ctx) {
     llvm::Value* v = ctx.symbolTable[name];

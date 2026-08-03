@@ -63,14 +63,13 @@ int Lexer::tokenizeNumber() {
     while (std::isalnum(lastChar)) {
         bool valid = false;
 
-        if ((base == 10 && std::isdigit(lastChar)) ||
-            (base == 16 && std::isxdigit(lastChar)) ||
+        if ((base == 10 && std::isdigit(lastChar)) || (base == 16 && std::isxdigit(lastChar)) ||
             (base == 8 && lastChar >= '0' && lastChar <= '7'))
             valid = true;
 
         if (!valid) {
-            std::cerr << "Lexical error: Invalid digit '" << static_cast<char>(lastChar) <<
-                "' for base " << base << std::endl;
+            std::cerr << "Lexical error: Invalid digit '" << static_cast<char>(lastChar)
+                      << "' for base " << base << std::endl;
             return tok_error;
         }
 

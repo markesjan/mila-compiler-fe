@@ -2,8 +2,6 @@
 
 namespace milan {
 
-NodeAST::NodeAST(int row, int col)
-    : row(row), col(col) {
-}
+NodeAST::NodeAST(int row, int col) : row(row), col(col) {}
 
 } // namespace milan

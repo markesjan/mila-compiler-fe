@@ -12,8 +12,9 @@ namespace milan {
 
 IfStmtAST::IfStmtAST(int row, int col, UPtrExpr cond, UPtrStmt thenStmt, UPtrStmt elseStmt)
     : StmtAST(row, col),
-      cond(std::move(cond)), thenStmt(std::move(thenStmt)), elseStmt(std::move(elseStmt)) {
-}
+      cond(std::move(cond)),
+      thenStmt(std::move(thenStmt)),
+      elseStmt(std::move(elseStmt)) {}
 
 llvm::Value* IfStmtAST::codegen(CodegenContext& ctx) {
     llvm::Value* condVal = cond->codegen(ctx);

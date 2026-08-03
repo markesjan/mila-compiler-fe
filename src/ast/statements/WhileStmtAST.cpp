@@ -1,13 +1,12 @@
 #include "WhileStmtAST.hpp"
 
-#include <llvm/IR/Function.h>
 #include <llvm/IR/Constants.h>
+#include <llvm/IR/Function.h>
 
 namespace milan {
 
 WhileStmtAST::WhileStmtAST(int row, int col, UPtrExpr cond, UPtrStmt loopStmt)
-    : StmtAST(row, col), cond(std::move(cond)), loopStmt(std::move(loopStmt)) {
-}
+    : StmtAST(row, col), cond(std::move(cond)), loopStmt(std::move(loopStmt)) {}
 
 llvm::Value* WhileStmtAST::codegen(CodegenContext& ctx) {
     llvm::Function* callerFunc = ctx.builder.GetInsertBlock()->getParent();

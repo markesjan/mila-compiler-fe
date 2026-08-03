@@ -5,9 +5,7 @@
 
 namespace milan {
 
-ContinueStmtAST::ContinueStmtAST(int row, int col)
-    : StmtAST(row, col) {
-}
+ContinueStmtAST::ContinueStmtAST(int row, int col) : StmtAST(row, col) {}
 
 llvm::Value* ContinueStmtAST::codegen(CodegenContext& ctx) {
     if (ctx.loopContinueBlocks.empty())
@@ -17,8 +15,8 @@ llvm::Value* ContinueStmtAST::codegen(CodegenContext& ctx) {
     ctx.builder.CreateBr(continueTarget);
 
     llvm::Function* callerFunc = ctx.builder.GetInsertBlock()->getParent();
-    llvm::BasicBlock* deadBlock = llvm::BasicBlock::Create(
-        ctx.context, "deadcode_after_continue", callerFunc);
+    llvm::BasicBlock* deadBlock =
+        llvm::BasicBlock::Create(ctx.context, "deadcode_after_continue", callerFunc);
     ctx.builder.SetInsertPoint(deadBlock);
 
     return llvm::ConstantInt::getTrue(ctx.context);

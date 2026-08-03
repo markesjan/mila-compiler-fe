@@ -6,8 +6,7 @@
 namespace milan {
 
 CallExprAST::CallExprAST(int row, int col, std::string name, std::vector<UPtrExpr> args)
-    : ExprAST(row, col), name(std::move(name)), args(std::move(args)) {
-}
+    : ExprAST(row, col), name(std::move(name)), args(std::move(args)) {}
 
 llvm::Value* CallExprAST::codegen(CodegenContext& ctx) {
     llvm::Function* calleeF = ctx.module.getFunction(name);

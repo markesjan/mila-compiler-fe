@@ -2,12 +2,7 @@
 
 namespace milan {
 
-enum class BaseType {
-    Int,
-    Bool,
-    Real,
-    Void
-};
+enum class BaseType { Int, Bool, Real, Void };
 
 class Type {
 public:

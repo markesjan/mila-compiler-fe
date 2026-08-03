@@ -10,7 +10,7 @@ public:
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:
-     std::int32_t val;
+    std::int32_t val;
 };
 
 } // namespace milan

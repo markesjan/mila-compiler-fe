@@ -4,9 +4,7 @@
 
 namespace milan {
 
-Parser::Parser()
-    : MilaContext(), MilaBuilder(MilaContext), MilaModule("mila", MilaContext) {
-}
+Parser::Parser() : MilaContext(), MilaBuilder(MilaContext), MilaModule("mila", MilaContext) {}
 
 bool Parser::parse() {
     getNextToken();
@@ -69,8 +67,8 @@ UPtrExpr Parser::parseExpression() {
 
     bool isRel = false;
     Token relTok = tok_error;
-    if (currTok == '=' || currTok == '<' || currTok == '>' || currTok == tok_lessequal
-        || currTok == tok_greaterequal || currTok == tok_notequal) {
+    if (currTok == '=' || currTok == '<' || currTok == '>' || currTok == tok_lessequal ||
+        currTok == tok_greaterequal || currTok == tok_notequal) {
         isRel = true;
         relTok = static_cast<Token>(currTok);
         getNextToken();

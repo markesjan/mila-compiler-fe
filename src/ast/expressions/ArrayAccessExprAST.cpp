@@ -6,8 +6,7 @@
 namespace milan {
 
 ArrayAccessExprAST::ArrayAccessExprAST(int row, int col, std::string name, UPtrExpr idx)
-    : ExprAST(row, col), name(std::move(name)), idx(std::move(idx)) {
-}
+    : ExprAST(row, col), name(std::move(name)), idx(std::move(idx)) {}
 
 llvm::Value* ArrayAccessExprAST::codegen(CodegenContext& ctx) {
     llvm::Value* arrayVal = ctx.symbolTable[name];
@@ -25,11 +24,11 @@ llvm::Value* ArrayAccessExprAST::codegen(CodegenContext& ctx) {
     llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(ctx.context), 0);
     llvm::Value* indices[] = {zero, indexVal};
 
-    llvm::Value* elemPtr = ctx.builder.CreateGEP(
-        alloca->getAllocatedType(), alloca, indices, "arrayidx");
+    llvm::Value* elemPtr =
+        ctx.builder.CreateGEP(alloca->getAllocatedType(), alloca, indices, "arrayidx");
 
-    return ctx.builder.CreateLoad(
-        alloca->getAllocatedType()->getArrayElementType(), elemPtr, "arrayload");
+    return ctx.builder.CreateLoad(alloca->getAllocatedType()->getArrayElementType(), elemPtr,
+                                  "arrayload");
 }
 
 } // namespace milan
