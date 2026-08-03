@@ -25,9 +25,16 @@ target_include_directories(mila PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ast
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ast/declarations
         ${CMAKE_CURRENT_SOURCE_DIR}/include/ast/expressions
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/ast/statements)
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/ast/statements
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/core)
 
-target_include_directories(mila PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories(mila PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ast
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ast/declarations
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ast/expressions
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ast/statements
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/core)
 
 target_include_directories(mila SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 
