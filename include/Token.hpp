@@ -6,11 +6,11 @@ enum Token {
     tok_eof = -1,
     tok_error = -41,
 
-    // numbers and identifiers
+    // Numbers and identifiers
     tok_identifier = -2,
     tok_number = -3,
 
-    // keywords
+    // Keywords
     tok_begin = -4,
     tok_end = -5,
     tok_const = -6,
@@ -42,16 +42,16 @@ enum Token {
     tok_and = -28,
     tok_xor = -29,
 
-    // keywords in for loop
+    // Keywords in for loop
     tok_to = -30,
     tok_downto = -31,
 
-    // keywords for array
+    // Keywords for array
     tok_array = -32,
     tok_of = -33,
     tok_range = -34,
 
-    // extra keywords for bonuses
+    // Extra keywords for bonuses
     tok_break = -35,
     tok_continue = -36,
     tok_boolean = -37,

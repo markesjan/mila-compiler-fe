@@ -8,7 +8,7 @@ Parser::Parser() : MilaContext(), MilaBuilder(MilaContext), MilaModule("mila", M
 
 bool Parser::parse() {
     getNextToken();
-    return true;
+    return parseProgram();
 }
 
 const llvm::Module& Parser::generate() {
@@ -56,6 +56,56 @@ bool Parser::match(int expectedToken) {
         return true;
     }
     return false;
+}
+
+bool Parser::parseProgram() {
+    if (currTok != tok_program)
+        return false;
+    getNextToken();
+
+    if (currTok != tok_identifier)
+        return false;
+    std::string programName = lexer.getIdentifierStr();
+    getNextToken();
+
+    if (!match(';'))
+        return false;
+
+    std::vector<UPtrDecl> emptyDecls;
+    // TODO
+
+    UPtrStmt mainBlock = parseBlock();
+    if (!mainBlock)
+        return false;
+
+    if (!match('.'))
+        return false;
+
+    this->programAST =
+        std::make_unique<Program>(programName, std::move(emptyDecls), std::move(mainBlock));
+    return true;
+}
+
+UPtrStmt Parser::parseBlock() {
+    int row = 0, col = 0;
+
+    if (currTok != tok_begin)
+        return nullptr;
+    getNextToken();
+
+    std::vector<UPtrStmt> stmts = parseStatements();
+
+    if (currTok != tok_end)
+        return nullptr;
+
+    return std::make_unique<CompoundStmtAST>(row, col, std::move(stmts));
+}
+
+std::vector<UPtrStmt> Parser::parseStatements() {
+    std::vector<UPtrStmt> stmts;
+    // TODO
+
+    return stmts;
 }
 
 UPtrExpr Parser::parseExpression() {

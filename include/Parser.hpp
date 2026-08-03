@@ -6,6 +6,8 @@
 
 #include "ExprAST.hpp"
 #include "Lexer.hpp"
+#include "Program.hpp"
+#include "StmtAST.hpp"
 
 namespace milan {
 
@@ -20,6 +22,7 @@ public:
 private:
     Lexer lexer;
     int currTok;
+    std::unique_ptr<Program> programAST;
 
     llvm::LLVMContext MilaContext;
     llvm::IRBuilder<> MilaBuilder;
@@ -28,6 +31,9 @@ private:
     int getNextToken();
     bool match(int expectedToken);
 
+    bool parseProgram();
+    UPtrStmt parseBlock();
+    std::vector<UPtrStmt> parseStatements();
     UPtrExpr parseExpression();
     UPtrExpr parseSimpleExpr();
     UPtrExpr parseTerm();
