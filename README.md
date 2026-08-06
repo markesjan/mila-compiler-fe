@@ -1,4 +1,4 @@
-# Semestral Work
+# Mila Compiler FE
 
 This is the repository that serves as a simple template for semestral work.
 
