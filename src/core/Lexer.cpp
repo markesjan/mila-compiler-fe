@@ -8,8 +8,15 @@
 namespace milan {
 
 int Lexer::nextToken() {
-    while (std::isspace(lastChar))
+    while (std::isspace(lastChar) || lastChar == '{') {
+        if (lastChar == '{') {
+            do {
+                lastChar = std::cin.get();
+            } while (lastChar != '}' && lastChar != EOF);
+        }
+
         lastChar = std::cin.get();
+    }
 
     if (std::isalpha(lastChar))
         return tokenizeKeyword();
