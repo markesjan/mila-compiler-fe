@@ -30,10 +30,14 @@ private:
 
     int getNextToken();
     bool match(int expectedToken);
-
     bool parseProgram();
+
+    std::vector<UPtrDecl> parseConstSection();
+    std::vector<UPtrDecl> parseVarSection();
+
     UPtrStmt parseBlock();
     std::vector<UPtrStmt> parseStatements();
+
     UPtrExpr parseExpression();
     UPtrExpr parseSimpleExpr();
     UPtrExpr parseTerm();

@@ -56,8 +56,17 @@ bool Parser::parseProgram() {
     if (!match(';'))
         return false;
 
-    std::vector<UPtrDecl> emptyDecls;
-    // TODO
+    std::vector<UPtrDecl> decls;
+    while (currTok == tok_const || currTok == tok_var) {
+        if (currTok == tok_const) {
+            auto constDecls = parseConstSection();
+            std::move(constDecls.begin(), constDecls.end(), std::back_inserter(decls));
+        }
+        if (currTok == tok_var) {
+            auto varDecls = parseVarSection();
+            std::move(varDecls.begin(), varDecls.end(), std::back_inserter(decls));
+        }
+    }
 
     UPtrStmt mainBlock = parseBlock();
     if (!mainBlock)
@@ -67,8 +76,57 @@ bool Parser::parseProgram() {
         return false;
 
     this->programAST =
-        std::make_unique<Program>(programName, std::move(emptyDecls), std::move(mainBlock));
+        std::make_unique<Program>(programName, std::move(decls), std::move(mainBlock));
     return true;
+}
+
+std::vector<UPtrDecl> Parser::parseConstSection() {
+    std::vector<UPtrDecl> decls;
+
+    getNextToken();
+    while (currTok == tok_identifier) {
+        std::string name = lexer.getIdentifierStr();
+        getNextToken();
+
+        if (!match('='))
+            return decls;
+
+        auto expr = parseExpression();
+
+        if (!match(';'))
+            return decls;
+
+        decls.push_back(std::make_unique<ConstantDeclAST>(0, 0, name, std::move(expr)));
+    }
+
+    return decls;
+}
+
+std::vector<UPtrDecl> Parser::parseVarSection() {
+    std::vector<UPtrDecl> decls;
+
+    getNextToken();
+    while (currTok == tok_identifier) {
+        std::vector<std::string> names;
+        names.push_back(lexer.getIdentifierStr());
+        getNextToken();
+
+        while (match(',')) {
+            names.push_back(lexer.getIdentifierStr());
+            getNextToken();
+        }
+
+        if (!match(':'))
+            return decls;
+        if (!match(tok_integer))
+            return decls;
+        if (!match(';'))
+            return decls;
+
+        decls.push_back(std::make_unique<VariableDeclAST>(0, 0, names, Type(BaseType::Int)));
+    }
+
+    return decls;
 }
 
 UPtrStmt Parser::parseBlock() {

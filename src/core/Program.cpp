@@ -14,6 +14,9 @@ void Program::codegen(CodegenContext& ctx) {
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(ctx.context, "entry", mainFunc);
     ctx.builder.SetInsertPoint(entryBlock);
 
+    for (const auto& d : globalDecls)
+        d->codegen(ctx);
+
     if (mainBlock)
         mainBlock->codegen(ctx);
 
