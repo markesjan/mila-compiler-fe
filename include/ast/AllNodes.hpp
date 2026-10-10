@@ -23,4 +23,5 @@
 #include "ExitStmtAST.hpp"
 #include "ForStmtAST.hpp"
 #include "IfStmtAST.hpp"
+#include "ReadlnStmtAST.hpp"
 #include "WhileStmtAST.hpp"

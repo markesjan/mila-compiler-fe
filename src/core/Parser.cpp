@@ -12,15 +12,28 @@ bool Parser::parse() {
 }
 
 const llvm::Module& Parser::generate() {
+    // Create readln function
+    {
+        std::vector<llvm::Type*> ptrs(1, llvm::PointerType::getUnqual(MilaContext));
+        llvm::FunctionType* fnType =
+            llvm::FunctionType::get(llvm::Type::getInt32Ty(MilaContext), ptrs, false);
+        llvm::Function* fn =
+            llvm::Function::Create(fnType, llvm::Function::ExternalLinkage, "readln", MilaModule);
+
+        for (auto& arg : fn->args())
+            arg.setName("x");
+    }
+
     // Create writeln function
     {
-        std::vector<llvm::Type*> Ints(1, llvm::Type::getInt32Ty(MilaContext));
-        llvm::FunctionType* FT =
-            llvm::FunctionType::get(llvm::Type::getInt32Ty(MilaContext), Ints, false);
-        llvm::Function* F =
-            llvm::Function::Create(FT, llvm::Function::ExternalLinkage, "writeln", MilaModule);
-        for (auto& Arg : F->args())
-            Arg.setName("x");
+        std::vector<llvm::Type*> ints(1, llvm::Type::getInt32Ty(MilaContext));
+        llvm::FunctionType* fnType =
+            llvm::FunctionType::get(llvm::Type::getInt32Ty(MilaContext), ints, false);
+        llvm::Function* fn =
+            llvm::Function::Create(fnType, llvm::Function::ExternalLinkage, "writeln", MilaModule);
+
+        for (auto& arg : fn->args())
+            arg.setName("x");
     }
 
     if (programAST) {
@@ -208,6 +221,22 @@ UPtrStmt Parser::parseStatement() {
                 return nullptr;
 
             return std::make_unique<AssignStmtAST>(row, col, name, std::move(valExpr), nullptr);
+        }
+
+        if (name == "readln") {
+            if (!match('('))
+                return nullptr;
+            if (currTok != tok_identifier)
+                return nullptr;
+
+            std::string readVarName = lexer.getIdentifierStr();
+
+            getNextToken();
+
+            if (!match(')'))
+                return nullptr;
+
+            return std::make_unique<ReadlnStmtAST>(row, col, readVarName);
         }
 
         // Procedure call
