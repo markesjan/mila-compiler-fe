@@ -40,16 +40,19 @@ bool Parser::match(int expectedToken) {
         getNextToken();
         return true;
     }
+
     return false;
 }
 
 bool Parser::parseProgram() {
     if (currTok != tok_program)
         return false;
+
     getNextToken();
 
     if (currTok != tok_identifier)
         return false;
+
     std::string programName = lexer.getIdentifierStr();
     getNextToken();
 
@@ -77,6 +80,7 @@ bool Parser::parseProgram() {
 
     this->programAST =
         std::make_unique<Program>(programName, std::move(decls), std::move(mainBlock));
+
     return true;
 }
 
@@ -134,12 +138,14 @@ UPtrStmt Parser::parseBlock() {
 
     if (currTok != tok_begin)
         return nullptr;
+
     getNextToken();
 
     std::vector<UPtrStmt> stmts = parseStatements();
 
     if (currTok != tok_end)
         return nullptr;
+
     getNextToken();
 
     return std::make_unique<CompoundStmtAST>(row, col, std::move(stmts));
@@ -147,9 +153,94 @@ UPtrStmt Parser::parseBlock() {
 
 std::vector<UPtrStmt> Parser::parseStatements() {
     std::vector<UPtrStmt> stmts;
-    // TODO
+
+    while (currTok != tok_end && currTok != tok_eof) {
+        auto stmt = parseStatement();
+        if (!stmt)
+            return {};
+
+        stmts.push_back(std::move(stmt));
+
+        if (currTok == ';')
+            getNextToken();
+        else
+            break;
+    }
 
     return stmts;
+}
+
+UPtrStmt Parser::parseStatement() {
+    int row = 0, col = 0;
+
+    if (currTok == tok_identifier) {
+        std::string name = lexer.getIdentifierStr();
+        getNextToken();
+
+        // Assignment to array element
+        if (currTok == '[') {
+            getNextToken();
+
+            auto indexExpr = parseExpression();
+            if (!indexExpr)
+                return nullptr;
+
+            if (!match(']'))
+                return nullptr;
+
+            if (!match(tok_assign))
+                return nullptr;
+
+            auto valExpr = parseExpression();
+            if (!valExpr)
+                return nullptr;
+
+            return std::make_unique<AssignStmtAST>(row, col, name, std::move(valExpr),
+                                                   std::move(indexExpr));
+        }
+
+        // Assignment to simple variable
+        if (currTok == tok_assign) {
+            getNextToken();
+
+            auto valExpr = parseExpression();
+            if (!valExpr)
+                return nullptr;
+
+            return std::make_unique<AssignStmtAST>(row, col, name, std::move(valExpr), nullptr);
+        }
+
+        // Procedure call
+        std::vector<UPtrExpr> args;
+        if (currTok == '(') {
+            getNextToken();
+
+            if (currTok != ')') {
+                while (true) {
+                    auto arg = parseExpression();
+                    if (!arg)
+                        return nullptr;
+
+                    args.push_back(std::move(arg));
+
+                    if (currTok == ')')
+                        break;
+                    if (!match(','))
+                        return nullptr;
+                }
+            }
+
+            getNextToken();
+        }
+
+        return std::make_unique<CallStmtAST>(row, col, name, std::move(args));
+    }
+
+    if (currTok == tok_begin)
+        return parseBlock();
+
+    // Empty statement
+    return std::make_unique<EmptyStmtAST>(row, col);
 }
 
 UPtrExpr Parser::parseExpression() {
@@ -161,6 +252,7 @@ UPtrExpr Parser::parseExpression() {
 
     bool isRel = false;
     Token relTok = tok_error;
+
     if (currTok == '=' || currTok == '<' || currTok == '>' || currTok == tok_lessequal ||
         currTok == tok_greaterequal || currTok == tok_notequal) {
         isRel = true;
@@ -248,19 +340,24 @@ UPtrExpr Parser::parseFactor() {
 
     if (currTok == tok_not) {
         getNextToken();
+
         auto factor = parseFactor();
         if (!factor)
             return nullptr;
+
         return std::make_unique<UnaryOpExprAST>(row, col, tok_not, std::move(factor));
     }
 
     if (currTok == '(') {
         getNextToken();
+
         auto expr = parseExpression();
         if (!expr)
             return nullptr;
+
         if (!match(')'))
             return nullptr;
+
         return expr;
     }
 
@@ -274,17 +371,21 @@ UPtrExpr Parser::parseFactorIdentifier(int row, int col) {
     // Array access
     if (currTok == '[') {
         getNextToken();
+
         auto indexExpr = parseExpression();
         if (!indexExpr)
             return nullptr;
+
         if (!match(']'))
             return nullptr;
+
         return std::make_unique<ArrayAccessExprAST>(row, col, name, std::move(indexExpr));
     }
 
     // Function call
     if (currTok == '(') {
         getNextToken();
+
         std::vector<UPtrExpr> args;
         if (currTok != ')') {
             while (true) {
@@ -300,6 +401,7 @@ UPtrExpr Parser::parseFactorIdentifier(int row, int col) {
                     return nullptr;
             }
         }
+
         getNextToken();
         return std::make_unique<CallExprAST>(row, col, name, std::move(args));
     }

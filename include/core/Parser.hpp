@@ -36,6 +36,7 @@ private:
     std::vector<UPtrDecl> parseVarSection();
 
     UPtrStmt parseBlock();
+    UPtrStmt parseStatement();
     std::vector<UPtrStmt> parseStatements();
 
     UPtrExpr parseExpression();
