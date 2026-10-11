@@ -11,12 +11,15 @@ int Lexer::nextToken() {
     while (std::isspace(lastChar) || lastChar == '{') {
         if (lastChar == '{') {
             do {
-                lastChar = std::cin.get();
+                lastChar = readNextChar();
             } while (lastChar != '}' && lastChar != EOF);
         }
 
-        lastChar = std::cin.get();
+        lastChar = readNextChar();
     }
+
+    tokRow = currRow;
+    tokCol = currCol;
 
     if (std::isalpha(lastChar))
         return tokenizeKeyword();
@@ -28,7 +31,7 @@ int Lexer::nextToken() {
         return tok_eof;
 
     int currChar = lastChar;
-    lastChar = std::cin.get();
+    lastChar = readNextChar();
     return currChar;
 }
 
@@ -40,9 +43,17 @@ int Lexer::getNumVal() const {
     return this->numVal;
 }
 
+int Lexer::getRow() const {
+    return tokRow;
+}
+
+int Lexer::getCol() const {
+    return tokCol;
+}
+
 int Lexer::tokenizeKeyword() {
     identifierStr = static_cast<char>(lastChar);
-    while (std::isalnum(lastChar = std::cin.get()))
+    while (std::isalnum(lastChar = readNextChar()))
         identifierStr += static_cast<char>(lastChar);
 
     std::transform(identifierStr.begin(), identifierStr.end(), identifierStr.begin(),
@@ -61,10 +72,10 @@ int Lexer::tokenizeNumber() {
 
     if (lastChar == '$') {
         base = 16;
-        lastChar = std::cin.get();
+        lastChar = readNextChar();
     } else if (lastChar == '&') {
         base = 8;
-        lastChar = std::cin.get();
+        lastChar = readNextChar();
     }
 
     while (std::isalnum(lastChar)) {
@@ -81,7 +92,7 @@ int Lexer::tokenizeNumber() {
         }
 
         numStr += static_cast<char>(lastChar);
-        lastChar = std::cin.get();
+        lastChar = readNextChar();
     }
 
     if (numStr.empty()) {
@@ -101,37 +112,50 @@ int Lexer::tokenizeNumber() {
 
 int Lexer::tokenizeOperator() {
     if (lastChar == ':') {
-        lastChar = std::cin.get();
+        lastChar = readNextChar();
         if (lastChar == '=') {
-            lastChar = std::cin.get();
+            lastChar = readNextChar();
             return tok_assign;
         }
         return ':';
     }
 
     if (lastChar == '<') {
-        lastChar = std::cin.get();
+        lastChar = readNextChar();
         if (lastChar == '>') {
-            lastChar = std::cin.get();
+            lastChar = readNextChar();
             return tok_notequal;
         }
         if (lastChar == '=') {
-            lastChar = std::cin.get();
+            lastChar = readNextChar();
             return tok_lessequal;
         }
         return '<';
     }
 
     if (lastChar == '>') {
-        lastChar = std::cin.get();
+        lastChar = readNextChar();
         if (lastChar == '=') {
-            lastChar = std::cin.get();
+            lastChar = readNextChar();
             return tok_greaterequal;
         }
         return '>';
     }
 
     return tok_error;
+}
+
+int Lexer::readNextChar() {
+    int ch = std::cin.get();
+
+    if (ch == '\n') {
+        ++currRow;
+        currCol = 0;
+    } else if (ch != EOF) {
+        ++currCol;
+    }
+
+    return ch;
 }
 
 } // namespace milan

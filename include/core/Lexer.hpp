@@ -16,15 +16,23 @@ public:
 
     const std::string& getIdentifierStr() const;
     int getNumVal() const;
+    int getRow() const;
+    int getCol() const;
 
 private:
     std::string identifierStr;
     int numVal;
     int lastChar = ' ';
 
+    int currRow = 1;
+    int currCol = 0;
+    int tokRow = 1;
+    int tokCol = 0;
+
     int tokenizeKeyword();
     int tokenizeNumber();
     int tokenizeOperator();
+    int readNextChar();
 
     inline static const std::unordered_map<std::string, Token> keywords = {
         {"program", tok_program},
