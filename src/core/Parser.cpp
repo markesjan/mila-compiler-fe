@@ -1,5 +1,7 @@
 #include "Parser.hpp"
 
+#include <format>
+
 #include "AllNodes.hpp"
 
 namespace milan {
@@ -69,7 +71,7 @@ bool Parser::parseProgram() {
     std::string programName = lexer.getIdentifierStr();
     getNextToken();
 
-    if (!match(';'))
+    if (!expect(';', "program header"))
         return false;
 
     std::vector<UPtrDecl> decls;
@@ -88,7 +90,7 @@ bool Parser::parseProgram() {
     if (!mainBlock)
         return false;
 
-    if (!match('.'))
+    if (!expect('.', "end of program"))
         return false;
 
     this->programAST =
@@ -97,23 +99,62 @@ bool Parser::parseProgram() {
     return true;
 }
 
+bool Parser::expect(int expectedTok, std::string_view ctx) {
+    if (currTok != expectedTok) {
+        std::string msg = ctx.empty()
+                              ? std::format("Expected '{}', but got {}", tokenToString(expectedTok),
+                                            formatCurrentToken())
+                              : std::format("Expected '{}', but got {} in {}",
+                                            tokenToString(expectedTok), formatCurrentToken(), ctx);
+
+        Diagnostic::error(lexer.getRow(), lexer.getCol(), msg);
+        return false;
+    }
+
+    getNextToken();
+    return true;
+}
+
+std::string Parser::formatCurrentToken() const {
+    if (currTok == tok_identifier)
+        return std::format("identifier '{}'", lexer.getIdentifierStr());
+    if (currTok == tok_number)
+        return std::format("number '{}'", lexer.getNumVal());
+
+    return std::format("'{}'", tokenToString(currTok));
+}
+
+std::string Parser::tokenToString(int tok) {
+    if (tok >= 0 && tok < 128)
+        return std::string(1, static_cast<char>(tok));
+
+    auto it = tokenNames.find(tok);
+    if (it != tokenNames.end())
+        return std::string(it->second);
+
+    return "unknown token (" + std::to_string(tok) + ")";
+}
+
 std::vector<UPtrDecl> Parser::parseConstSection() {
     std::vector<UPtrDecl> decls;
 
     getNextToken();
     while (currTok == tok_identifier) {
+        int row = lexer.getRow(), col = lexer.getCol();
         std::string name = lexer.getIdentifierStr();
         getNextToken();
 
-        if (!match('='))
+        if (!expect('=', "constant declaration"))
             return decls;
 
         auto expr = parseExpression();
-
-        if (!match(';'))
+        if (!expr)
             return decls;
 
-        decls.push_back(std::make_unique<ConstantDeclAST>(0, 0, name, std::move(expr)));
+        if (!expect(';', "constant declaration"))
+            return decls;
+
+        decls.push_back(std::make_unique<ConstantDeclAST>(row, col, name, std::move(expr)));
     }
 
     return decls;
@@ -124,30 +165,36 @@ std::vector<UPtrDecl> Parser::parseVarSection() {
 
     getNextToken();
     while (currTok == tok_identifier) {
+        int row = lexer.getRow(), col = lexer.getCol();
         std::vector<std::string> names;
         names.push_back(lexer.getIdentifierStr());
         getNextToken();
 
         while (match(',')) {
+            if (currTok != tok_identifier) {
+                Diagnostic::error(lexer.getRow(), lexer.getCol(),
+                                  "Expected identifier after ',' in variable declaration");
+                return decls;
+            }
             names.push_back(lexer.getIdentifierStr());
             getNextToken();
         }
 
-        if (!match(':'))
+        if (!expect(':', "variable declaration"))
             return decls;
-        if (!match(tok_integer))
+        if (!expect(tok_integer, "variable type"))
             return decls;
-        if (!match(';'))
+        if (!expect(';', "variable declaration"))
             return decls;
 
-        decls.push_back(std::make_unique<VariableDeclAST>(0, 0, names, Type(BaseType::Int)));
+        decls.push_back(std::make_unique<VariableDeclAST>(row, col, names, Type(BaseType::Int)));
     }
 
     return decls;
 }
 
 UPtrStmt Parser::parseBlock() {
-    int row = 0, col = 0;
+    int row = lexer.getRow(), col = lexer.getCol();
 
     if (currTok != tok_begin)
         return nullptr;
@@ -156,10 +203,8 @@ UPtrStmt Parser::parseBlock() {
 
     std::vector<UPtrStmt> stmts = parseStatements();
 
-    if (currTok != tok_end)
+    if (!expect(tok_end, "block"))
         return nullptr;
-
-    getNextToken();
 
     return std::make_unique<CompoundStmtAST>(row, col, std::move(stmts));
 }
@@ -184,7 +229,7 @@ std::vector<UPtrStmt> Parser::parseStatements() {
 }
 
 UPtrStmt Parser::parseStatement() {
-    int row = 0, col = 0;
+    int row = lexer.getRow(), col = lexer.getCol();
 
     if (currTok == tok_identifier) {
         std::string name = lexer.getIdentifierStr();
@@ -233,7 +278,7 @@ UPtrStmt Parser::parseStatement() {
 
             getNextToken();
 
-            if (!match(')'))
+            if (!expect(')', "readln"))
                 return nullptr;
 
             return std::make_unique<ReadlnStmtAST>(row, col, readVarName);
@@ -273,7 +318,7 @@ UPtrStmt Parser::parseStatement() {
 }
 
 UPtrExpr Parser::parseExpression() {
-    int row = 0, col = 0;
+    int row = lexer.getRow(), col = lexer.getCol();
 
     UPtrExpr lhs = parseSimpleExpr();
     if (!lhs)
@@ -298,7 +343,7 @@ UPtrExpr Parser::parseExpression() {
 }
 
 UPtrExpr Parser::parseSimpleExpr() {
-    int row = 0, col = 0;
+    int row = lexer.getRow(), col = lexer.getCol();
 
     bool isNeg = false;
     if (currTok == '-') {
@@ -331,7 +376,7 @@ UPtrExpr Parser::parseSimpleExpr() {
 }
 
 UPtrExpr Parser::parseTerm() {
-    int row = 0, col = 0;
+    int row = lexer.getRow(), col = lexer.getCol();
 
     UPtrExpr lhs = parseFactor();
     if (!lhs)
@@ -356,7 +401,7 @@ UPtrExpr Parser::parseTerm() {
 }
 
 UPtrExpr Parser::parseFactor() {
-    int row = 0, col = 0;
+    int row = lexer.getRow(), col = lexer.getCol();
 
     if (currTok == tok_identifier)
         return parseFactorIdentifier(row, col);
@@ -384,7 +429,7 @@ UPtrExpr Parser::parseFactor() {
         if (!expr)
             return nullptr;
 
-        if (!match(')'))
+        if (!expect(')', "expression"))
             return nullptr;
 
         return expr;
@@ -405,7 +450,7 @@ UPtrExpr Parser::parseFactorIdentifier(int row, int col) {
         if (!indexExpr)
             return nullptr;
 
-        if (!match(']'))
+        if (!expect(']', "array index"))
             return nullptr;
 
         return std::make_unique<ArrayAccessExprAST>(row, col, name, std::move(indexExpr));
