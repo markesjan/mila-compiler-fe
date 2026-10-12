@@ -1,6 +1,3 @@
+.idea
 build
 out
-samples/*
-!samples/*.mila
-cmake-build-debug
-.idea

@@ -1,79 +1,64 @@
-#!/bin/bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+#!/usr/bin/env bash
+set -euo pipefail
 
-# saner programming env: these switches turn some bugs into errors
-set -o errexit -o pipefail -o noclobber -o nounset
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+MILA_COMPILER="${MILA_BIN:-${DIR}/build/mila}"
 
-# -allow a command to fail with !’s side effect on errexit
-# -use return value from ${PIPESTATUS[0]}, because ! hosed $?
-! getopt --test > /dev/null 
-if [[ ${PIPESTATUS[0]} -ne 4 ]]; then
-    echo 'I’m sorry, `getopt --test` failed in this environment.'
+if [[ ! -x "$MILA_COMPILER" ]]; then
+    echo "Error: Mila compiler binary not found at '$MILA_COMPILER'." >&2
+    echo "Please build the project first (e.g. cmake --build build)." >&2
     exit 1
 fi
 
-OPTIONS=dfo:v
-LONGOPTS=debug,force,output:,verbose
+LLC=$(command -v llc-18 || command -v llc || true)
+CLANG=$(command -v clang-18 || command -v clang || true)
 
-# -regarding ! and PIPESTATUS see above
-# -temporarily store output to be able to check for errors
-# -activate quoting/enhanced mode (e.g. by writing out “--options”)
-# -pass arguments only via   -- "$@"   to separate them correctly
-! PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTS --name "$0" -- "$@")
-if [[ ${PIPESTATUS[0]} -ne 0 ]]; then
-    # e.g. return value is 1
-    #  then getopt has complained about wrong arguments to stdout
-    exit 2
+if [[ -z "$LLC" || -z "$CLANG" ]]; then
+    echo "Error: 'llc' or 'clang' compiler tools not found in PATH." >&2
+    exit 1
 fi
-# read getopt’s output this way to handle the quoting right:
-eval set -- "$PARSED"
 
-d=n f=n v=n outFile=a.out
-# now enjoy the options in order and nicely split until we see --
-while true; do
+OUT_FILE="a.out"
+IN_FILE=""
+
+while [[ $# -gt 0 ]]; do
     case "$1" in
-        -d|--debug)
-            d=y
-            shift
-            ;;
-        -f|--force)
-            f=y
-            shift
-            ;;
-        -v|--verbose)
-            v=y
-            shift
-            ;;
         -o|--output)
-            outFile="$2"
+            OUT_FILE="$2"
             shift 2
             ;;
-        --)
+        -d|--debug|-v|--verbose|-f|--force)
             shift
-            break
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            exit 1
             ;;
         *)
-            echo "Programming error"
-            exit 3
+            if [[ -z "$IN_FILE" ]]; then
+                IN_FILE="$1"
+            else
+                echo "Error: Multiple input files specified." >&2
+                exit 1
+            fi
+            shift
             ;;
     esac
 done
 
-# handle non-option arguments
-if [[ $# -ne 1 ]]; then
-    echo "$0: A single input file is required."
-    exit 4
+if [[ -z "$IN_FILE" ]]; then
+    echo "Usage: $0 <input.mila> [-o <output>]" >&2
+    exit 1
 fi
 
-#echo "verbose: $v, force: $f, debug: $d, in: $1, out: $outFile"
+InputFileName=$(realpath "$IN_FILE")
+OutputFileName=$(realpath "$OUT_FILE")
+OutputFileBaseName="${OutputFileName%.*}"
 
-InputFileName=$(realpath "$1");
-OutputFileName=$(realpath "$outFile");
-OutputFileBaseName="${OutputFileName%%.*}"
+IR_FILE="${OutputFileBaseName}.ir"
+S_FILE="${OutputFileBaseName}.s"
 
-rm -f "$OutputFileBaseName.ir"
-#echo "DEBUG" "$OutputFileBaseName.ir" "$InputFileName" "${DIR}/build/mila"
-> "$OutputFileBaseName.ir" < "$InputFileName" "${DIR}/cmake-build-debug/mila" &&
-rm -f "$OutputFileBaseName.s"
-llc-18 "$OutputFileBaseName.ir" -o "$OutputFileBaseName.s" -relocation-model=pic &&
-clang-18 "$OutputFileBaseName.s" "${DIR}/src/fce.c" -o "$OutputFileName"
+# Compilation pipeline: FE -> llc -> clang with fnc.c
+"$MILA_COMPILER" < "$InputFileName" > "$IR_FILE"
+"$LLC" "$IR_FILE" -o "$S_FILE" -relocation-model=pic
+"$CLANG" "$S_FILE" "${DIR}/src/fnc.c" -o "$OutputFileName"
