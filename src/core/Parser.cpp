@@ -231,6 +231,26 @@ std::vector<UPtrStmt> Parser::parseStatements() {
 UPtrStmt Parser::parseStatement() {
     int row = lexer.getRow(), col = lexer.getCol();
 
+    if (currTok == tok_if)
+        return parseIfStatement();
+    if (currTok == tok_while)
+        return parseWhileStatement();
+    if (currTok == tok_for)
+        return parseForStatement();
+
+    if (currTok == tok_break) {
+        getNextToken();
+        return std::make_unique<BreakStmtAST>(row, col);
+    }
+    if (currTok == tok_continue) {
+        getNextToken();
+        return std::make_unique<ContinueStmtAST>(row, col);
+    }
+    if (currTok == tok_exit) {
+        getNextToken();
+        return std::make_unique<ExitStmtAST>(row, col);
+    }
+
     if (currTok == tok_identifier) {
         std::string name = lexer.getIdentifierStr();
         getNextToken();
@@ -266,6 +286,38 @@ UPtrStmt Parser::parseStatement() {
                 return nullptr;
 
             return std::make_unique<AssignStmtAST>(row, col, name, std::move(valExpr), nullptr);
+        }
+
+        if (name == "inc" || name == "dec") {
+            if (!match('('))
+                return nullptr;
+
+            if (currTok != tok_identifier) {
+                Diagnostic::error(lexer.getRow(), lexer.getCol(),
+                                  std::format("Expected variable identifier in {}()", name));
+                return nullptr;
+            }
+
+            std::string targetVar = lexer.getIdentifierStr();
+            getNextToken();
+
+            UPtrExpr stepExpr = nullptr;
+            if (match(',')) {
+                stepExpr = parseExpression();
+                if (!stepExpr)
+                    return nullptr;
+            } else {
+                stepExpr = std::make_unique<NumberExprAST>(row, col, 1);
+            }
+
+            if (!expect(')', name))
+                return nullptr;
+
+            Token op = (name == "inc") ? static_cast<Token>('+') : static_cast<Token>('-');
+            auto varExpr = std::make_unique<VariableExprAST>(row, col, targetVar);
+            auto binOp = std::make_unique<BinaryOpExprAST>(row, col, op, std::move(varExpr),
+                                                           std::move(stepExpr));
+            return std::make_unique<AssignStmtAST>(row, col, targetVar, std::move(binOp), nullptr);
         }
 
         if (name == "readln") {
@@ -315,6 +367,98 @@ UPtrStmt Parser::parseStatement() {
 
     // Empty statement
     return std::make_unique<EmptyStmtAST>(row, col);
+}
+
+UPtrStmt Parser::parseIfStatement() {
+    int row = lexer.getRow(), col = lexer.getCol();
+
+    getNextToken();
+
+    UPtrExpr cond = parseExpression();
+    if (!cond)
+        return nullptr;
+
+    if (!expect(tok_then, "if statement"))
+        return nullptr;
+
+    UPtrStmt thenStmt = parseStatement();
+    if (!thenStmt)
+        return nullptr;
+
+    UPtrStmt elseStmt = nullptr;
+    if (currTok == tok_else) {
+        getNextToken();
+
+        elseStmt = parseStatement();
+        if (!elseStmt)
+            return nullptr;
+    }
+
+    return std::make_unique<IfStmtAST>(row, col, std::move(cond), std::move(thenStmt),
+                                       std::move(elseStmt));
+}
+
+UPtrStmt Parser::parseWhileStatement() {
+    int row = lexer.getRow(), col = lexer.getCol();
+
+    getNextToken();
+
+    UPtrExpr cond = parseExpression();
+    if (!cond)
+        return nullptr;
+
+    if (!expect(tok_do, "while loop"))
+        return nullptr;
+
+    UPtrStmt body = parseStatement();
+    if (!body)
+        return nullptr;
+
+    return std::make_unique<WhileStmtAST>(row, col, std::move(cond), std::move(body));
+}
+
+UPtrStmt Parser::parseForStatement() {
+    int row = lexer.getRow(), col = lexer.getCol();
+
+    getNextToken();
+
+    if (currTok != tok_identifier) {
+        Diagnostic::error(row, col, std::format("Expected variable identifier in for loop"));
+        return nullptr;
+    }
+
+    std::string targetVar = lexer.getIdentifierStr();
+    getNextToken();
+
+    if (!expect(tok_assign, "for loop"))
+        return nullptr;
+
+    UPtrExpr startExpr = parseExpression();
+    if (!startExpr)
+        return nullptr;
+
+    if (currTok != tok_to && currTok != tok_downto) {
+        Diagnostic::error(lexer.getRow(), lexer.getCol(),
+                          std::format("Expected 'to' or 'downto' in for loop"));
+        return nullptr;
+    }
+
+    auto direction = static_cast<Token>(currTok);
+    getNextToken();
+
+    UPtrExpr stopExpr = parseExpression();
+    if (!stopExpr)
+        return nullptr;
+
+    if (!expect(tok_do, "for loop"))
+        return nullptr;
+
+    UPtrStmt body = parseStatement();
+    if (!body)
+        return nullptr;
+
+    return std::make_unique<ForStmtAST>(row, col, std::move(targetVar), std::move(startExpr),
+                                        std::move(stopExpr), direction, std::move(body));
 }
 
 UPtrExpr Parser::parseExpression() {

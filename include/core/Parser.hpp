@@ -40,8 +40,11 @@ private:
     std::vector<UPtrDecl> parseVarSection();
 
     UPtrStmt parseBlock();
-    UPtrStmt parseStatement();
     std::vector<UPtrStmt> parseStatements();
+    UPtrStmt parseStatement();
+    UPtrStmt parseIfStatement();
+    UPtrStmt parseWhileStatement();
+    UPtrStmt parseForStatement();
 
     UPtrExpr parseExpression();
     UPtrExpr parseSimpleExpr();
@@ -59,7 +62,9 @@ private:
         {tok_downto, "downto"},   {tok_var, "var"},
         {tok_const, "const"},     {tok_integer, "integer"},
         {tok_assign, ":="},       {tok_notequal, "<>"},
-        {tok_lessequal, "<="},    {tok_greaterequal, ">="}};
+        {tok_lessequal, "<="},    {tok_greaterequal, ">="},
+        {tok_break, "break"},     {tok_continue, "continue"},
+        {tok_exit, "exit"}};
 };
 
 } // namespace milan
