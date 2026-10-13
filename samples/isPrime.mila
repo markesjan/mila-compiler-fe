@@ -1,4 +1,4 @@
-program isprime;
+program isPrime;
 
 function isprime(n: integer): integer;
 var i: integer;

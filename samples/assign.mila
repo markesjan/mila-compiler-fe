@@ -1,4 +1,5 @@
-program test;
+program assign;
+
 var
   a: integer;
 begin

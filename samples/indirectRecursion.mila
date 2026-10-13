@@ -1,4 +1,4 @@
-program indirectrecursion;
+program indirectRecursion;
 
 function isodd(n: integer): integer; forward;
 function iseven(n: integer): integer;
