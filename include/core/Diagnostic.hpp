@@ -4,12 +4,7 @@
 
 namespace milan {
 
-enum class LogLevel {
-    Note,
-    Warning,
-    Error,
-    Debug
-};
+enum class LogLevel { Note, Warning, Error, Debug };
 
 class Diagnostic {
 public:

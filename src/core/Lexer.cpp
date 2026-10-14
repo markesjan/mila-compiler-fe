@@ -25,7 +25,7 @@ int Lexer::nextToken() {
         return tokenizeKeyword();
     if (std::isdigit(lastChar) || lastChar == '$' || lastChar == '&')
         return tokenizeNumber();
-    if (lastChar == ':' || lastChar == '<' || lastChar == '>')
+    if (lastChar == ':' || lastChar == '<' || lastChar == '>' || lastChar == '.')
         return tokenizeOperator();
     if (lastChar == EOF)
         return tok_eof;
@@ -140,6 +140,15 @@ int Lexer::tokenizeOperator() {
             return tok_greaterequal;
         }
         return '>';
+    }
+
+    if (lastChar == '.') {
+        lastChar = readNextChar();
+        if (lastChar == '.') {
+            lastChar = readNextChar();
+            return tok_range;
+        }
+        return '.';
     }
 
     return tok_error;

@@ -9,6 +9,7 @@
 #include "Lexer.hpp"
 #include "Program.hpp"
 #include "StmtAST.hpp"
+#include "Type.hpp"
 
 namespace milan {
 
@@ -32,6 +33,7 @@ private:
     int getNextToken();
     bool match(int expectedToken);
     bool parseProgram();
+    std::optional<Type> parseType();
     bool expect(int expectedTok, std::string_view ctx = "");
     std::string formatCurrentToken() const;
     static std::string tokenToString(int tok);
@@ -64,7 +66,8 @@ private:
         {tok_assign, ":="},       {tok_notequal, "<>"},
         {tok_lessequal, "<="},    {tok_greaterequal, ">="},
         {tok_break, "break"},     {tok_continue, "continue"},
-        {tok_exit, "exit"}};
+        {tok_exit, "exit"},       {tok_array, "array"},
+        {tok_of, "of"},           {tok_range, ".."}};
 };
 
 } // namespace milan

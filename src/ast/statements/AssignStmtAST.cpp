@@ -23,6 +23,16 @@ llvm::Value* AssignStmtAST::codegen(CodegenContext& ctx) {
         if (!indexVal)
             return nullptr;
 
+        auto it = ctx.typeTable.find(name);
+        if (it != ctx.typeTable.end() && it->second.isArrayType()) {
+            int low = it->second.getLow();
+            if (low != 0) {
+                llvm::Value* lowVal =
+                    llvm::ConstantInt::get(llvm::Type::getInt32Ty(ctx.context), low);
+                indexVal = ctx.builder.CreateSub(indexVal, lowVal, "subidx");
+            }
+        }
+
         llvm::Value* zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(ctx.context), 0);
         llvm::Value* indices[] = {zero, indexVal};
 

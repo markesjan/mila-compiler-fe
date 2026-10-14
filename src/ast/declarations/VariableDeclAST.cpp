@@ -33,8 +33,9 @@ llvm::Value* VariableDeclAST::codegen(CodegenContext& ctx) {
     for (const auto& name : names) {
         llvm::IRBuilder tmpBuilder(&callerFunc->getEntryBlock(),
                                    callerFunc->getEntryBlock().begin());
-        llvm::AllocaInst* alloca = tmpBuilder.CreateAlloca(varType, nullptr, name.c_str());
+        llvm::AllocaInst* alloca = tmpBuilder.CreateAlloca(varType, nullptr, name);
         ctx.symbolTable[name] = alloca;
+        ctx.typeTable[name] = type;
     }
 
     return llvm::ConstantInt::getTrue(ctx.context);

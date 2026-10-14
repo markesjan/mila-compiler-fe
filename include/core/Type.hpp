@@ -6,6 +6,7 @@ enum class BaseType { Int, Bool, Real, Void };
 
 class Type {
 public:
+    Type() = default;
     explicit Type(BaseType base);
     static Type createArray(int low, int high, BaseType elementBase);
 

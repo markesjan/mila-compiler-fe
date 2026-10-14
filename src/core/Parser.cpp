@@ -39,7 +39,7 @@ const llvm::Module& Parser::generate() {
     }
 
     if (programAST) {
-        CodegenContext ctx{MilaContext, MilaModule, MilaBuilder, {}, {}, {}};
+        CodegenContext ctx{MilaContext, MilaModule, MilaBuilder, {}, {}, {}, {}};
         programAST->codegen(ctx);
     }
 
@@ -97,6 +97,63 @@ bool Parser::parseProgram() {
         std::make_unique<Program>(programName, std::move(decls), std::move(mainBlock));
 
     return true;
+}
+
+std::optional<Type> Parser::parseType() {
+    if (currTok == tok_integer) {
+        getNextToken();
+        return Type(BaseType::Int);
+    }
+
+    if (currTok == tok_array) {
+        getNextToken();
+
+        if (!expect('[', "array declaration"))
+            return std::nullopt;
+
+        auto parseBound = [&]() -> std::optional<int> {
+            bool isNeg = false;
+            if (currTok == '-') {
+                isNeg = true;
+                getNextToken();
+            }
+
+            if (currTok != tok_number) {
+                Diagnostic::error(lexer.getRow(), lexer.getCol(), "Expected number in array range");
+                return std::nullopt;
+            }
+
+            int val = lexer.getNumVal();
+            if (isNeg)
+                val = -val;
+
+            getNextToken();
+            return val;
+        };
+
+        auto low = parseBound();
+        if (!low)
+            return std::nullopt;
+
+        if (!expect(tok_range, "array range"))
+            return std::nullopt;
+
+        auto high = parseBound();
+        if (!high)
+            return std::nullopt;
+
+        if (!expect(']', "array declaration"))
+            return std::nullopt;
+        if (!expect(tok_of, "array declaration"))
+            return std::nullopt;
+        if (!expect(tok_integer, "array element type"))
+            return std::nullopt;
+
+        return Type(Type::createArray(*low, *high, BaseType::Int));
+    }
+
+    Diagnostic::error(lexer.getRow(), lexer.getCol(), "Expected type in variable declaration");
+    return std::nullopt;
 }
 
 bool Parser::expect(int expectedTok, std::string_view ctx) {
@@ -182,12 +239,15 @@ std::vector<UPtrDecl> Parser::parseVarSection() {
 
         if (!expect(':', "variable declaration"))
             return decls;
-        if (!expect(tok_integer, "variable type"))
+
+        auto typeOpt = parseType();
+        if (!typeOpt)
             return decls;
+
         if (!expect(';', "variable declaration"))
             return decls;
 
-        decls.push_back(std::make_unique<VariableDeclAST>(row, col, names, Type(BaseType::Int)));
+        decls.push_back(std::make_unique<VariableDeclAST>(row, col, names, *typeOpt));
     }
 
     return decls;
