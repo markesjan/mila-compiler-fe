@@ -1,0 +1,28 @@
+program test2_custom;
+
+var
+    limit, num, d, is_p: integer;
+
+begin
+    readln(limit);
+    if limit < 2 then
+        exit;
+
+    for num := 2 to limit do
+    begin
+        is_p := 1;
+        d := 2;
+        while (d * d) <= num do
+        begin
+            if (num mod d) = 0 then
+            begin
+                is_p := 0;
+                break;
+            end;
+            inc(d);
+        end;
+
+        if is_p = 1 then
+            writeln(num);
+    end;
+end.

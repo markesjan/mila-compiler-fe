@@ -1,0 +1,29 @@
+program test1_custom;
+
+const
+    MAX_COUNT = 25;
+
+var
+    n, i, a, b, temp: integer;
+
+begin
+    readln(n);
+    if n <= 0 then
+    begin
+        writeln(0);
+        exit;
+    end;
+
+    if n > MAX_COUNT then
+        n := MAX_COUNT;
+
+    a := 0;
+    b := 1;
+    for i := 1 to n do
+    begin
+        writeln(b);
+        temp := a + b;
+        a := b;
+        b := temp;
+    end;
+end.
