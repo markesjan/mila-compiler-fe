@@ -21,7 +21,7 @@ int Lexer::nextToken() {
     tokRow = currRow;
     tokCol = currCol;
 
-    if (std::isalpha(lastChar))
+    if (std::isalpha(lastChar) || lastChar == '_')
         return tokenizeKeyword();
     if (std::isdigit(lastChar) || lastChar == '$' || lastChar == '&')
         return tokenizeNumber();
@@ -53,7 +53,7 @@ int Lexer::getCol() const {
 
 int Lexer::tokenizeKeyword() {
     identifierStr = static_cast<char>(lastChar);
-    while (std::isalnum(lastChar = readNextChar()))
+    while (std::isalnum(lastChar = readNextChar()) || lastChar == '_')
         identifierStr += static_cast<char>(lastChar);
 
     std::transform(identifierStr.begin(), identifierStr.end(), identifierStr.begin(),
