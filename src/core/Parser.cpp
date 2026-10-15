@@ -105,6 +105,11 @@ std::optional<Type> Parser::parseType() {
         return Type(BaseType::Int);
     }
 
+    if (currTok == tok_boolean) {
+        getNextToken();
+        return Type(BaseType::Bool);
+    }
+
     if (currTok == tok_array) {
         getNextToken();
 
@@ -146,10 +151,20 @@ std::optional<Type> Parser::parseType() {
             return std::nullopt;
         if (!expect(tok_of, "array declaration"))
             return std::nullopt;
-        if (!expect(tok_integer, "array element type"))
-            return std::nullopt;
 
-        return Type(Type::createArray(*low, *high, BaseType::Int));
+        BaseType elemType = BaseType::Int;
+        if (currTok == tok_integer) {
+            elemType = BaseType::Int;
+            getNextToken();
+        } else if (currTok == tok_boolean) {
+            elemType = BaseType::Bool;
+            getNextToken();
+        } else {
+            Diagnostic::error(lexer.getRow(), lexer.getCol(), "Unknown array element type");
+            return std::nullopt;
+        }
+
+        return Type::createArray(*low, *high, elemType);
     }
 
     Diagnostic::error(lexer.getRow(), lexer.getCol(), "Expected type in variable declaration");
@@ -614,6 +629,12 @@ UPtrExpr Parser::parseFactor() {
         auto numExpr = std::make_unique<NumberExprAST>(row, col, lexer.getNumVal());
         getNextToken();
         return numExpr;
+    }
+
+    if (currTok == tok_true || currTok == tok_false) {
+        bool val = (currTok == tok_true);
+        getNextToken();
+        return std::make_unique<BooleanExprAST>(row, col, val);
     }
 
     if (currTok == tok_not) {

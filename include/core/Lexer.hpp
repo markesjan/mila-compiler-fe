@@ -63,7 +63,9 @@ private:
         {"break", tok_break},
         {"continue", tok_continue},
         {"array", tok_array},
-        {"of", tok_of}};
+        {"of", tok_of},
+        {"true", tok_true},
+        {"false", tok_false}};
 };
 
 } // namespace milan

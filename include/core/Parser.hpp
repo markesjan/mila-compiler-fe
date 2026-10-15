@@ -67,7 +67,9 @@ private:
         {tok_lessequal, "<="},    {tok_greaterequal, ">="},
         {tok_break, "break"},     {tok_continue, "continue"},
         {tok_exit, "exit"},       {tok_array, "array"},
-        {tok_of, "of"},           {tok_range, ".."}};
+        {tok_of, "of"},           {tok_range, ".."},
+        {tok_boolean, "boolean"}, {tok_true, "true"},
+        {tok_false, "false"}};
 };
 
 } // namespace milan
