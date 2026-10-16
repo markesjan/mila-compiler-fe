@@ -2,7 +2,7 @@
 
 namespace milan {
 
-BinaryOpExprAST::BinaryOpExprAST(int row, int col, Token op, UPtrExpr lhs, UPtrExpr rhs)
+BinaryOpExprAST::BinaryOpExprAST(int row, int col, TokenKind op, UPtrExpr lhs, UPtrExpr rhs)
     : ExprAST(row, col), op(op), lhs(std::move(lhs)), rhs(std::move(rhs)) {}
 
 llvm::Value* BinaryOpExprAST::codegen(CodegenContext& ctx) {
@@ -13,35 +13,35 @@ llvm::Value* BinaryOpExprAST::codegen(CodegenContext& ctx) {
 
     switch (op) {
         // Arithmetical
-        case '+':
+        case TokenKind::Plus:
             return ctx.builder.CreateAdd(lVal, rVal, "addtmp");
-        case '-':
+        case TokenKind::Minus:
             return ctx.builder.CreateSub(lVal, rVal, "subtmp");
-        case '*':
+        case TokenKind::Mul:
             return ctx.builder.CreateMul(lVal, rVal, "multmp");
-        case tok_div:
+        case TokenKind::Div:
             return ctx.builder.CreateSDiv(lVal, rVal, "divtmp");
-        case tok_mod:
+        case TokenKind::Mod:
             return ctx.builder.CreateSRem(lVal, rVal, "modtmp");
         // Logical
-        case tok_and:
+        case TokenKind::And:
             return ctx.builder.CreateAnd(lVal, rVal, "andtmp");
-        case tok_or:
+        case TokenKind::Or:
             return ctx.builder.CreateOr(lVal, rVal, "ortmp");
-        case tok_xor:
+        case TokenKind::Xor:
             return ctx.builder.CreateXor(lVal, rVal, "xortmp");
         // Relational
-        case '=':
+        case TokenKind::Equal:
             return ctx.builder.CreateICmpEQ(lVal, rVal, "eqtmp");
-        case tok_notequal:
+        case TokenKind::NotEqual:
             return ctx.builder.CreateICmpNE(lVal, rVal, "netmp");
-        case '<':
+        case TokenKind::Less:
             return ctx.builder.CreateICmpSLT(lVal, rVal, "lttmp");
-        case tok_lessequal:
+        case TokenKind::LessEqual:
             return ctx.builder.CreateICmpSLE(lVal, rVal, "letmp");
-        case '>':
+        case TokenKind::Greater:
             return ctx.builder.CreateICmpSGT(lVal, rVal, "gttmp");
-        case tok_greaterequal:
+        case TokenKind::GreaterEqual:
             return ctx.builder.CreateICmpSGE(lVal, rVal, "getmp");
         default:
             return nullptr;

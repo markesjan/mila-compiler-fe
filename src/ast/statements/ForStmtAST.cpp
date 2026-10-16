@@ -12,7 +12,7 @@ ForStmtAST::ForStmtAST(int row,
                        std::string name,
                        UPtrExpr start,
                        UPtrExpr stop,
-                       Token direction,
+                       TokenKind direction,
                        UPtrStmt loopStmt)
     : StmtAST(row, col),
       name(std::move(name)),
@@ -47,7 +47,7 @@ llvm::Value* ForStmtAST::codegen(CodegenContext& ctx) {
     llvm::Value* currVal =
         ctx.builder.CreateLoad(varAlloca->getAllocatedType(), varAlloca, name.c_str());
     llvm::Value* condResult = nullptr;
-    if (direction == tok_to)
+    if (direction == TokenKind::To)
         condResult = ctx.builder.CreateICmpSLE(currVal, stopVal, "tocond");
     else
         condResult = ctx.builder.CreateICmpSGE(currVal, stopVal, "downtocond");
@@ -81,7 +81,7 @@ llvm::Value* ForStmtAST::codegen(CodegenContext& ctx) {
     llvm::Value* one = llvm::ConstantInt::get(llvm::Type::getInt32Ty(ctx.context), 1);
     llvm::Value* nextVal = nullptr;
 
-    if (direction == tok_to)
+    if (direction == TokenKind::To)
         nextVal = ctx.builder.CreateAdd(stepLoad, one, "nextval");
     else
         nextVal = ctx.builder.CreateSub(stepLoad, one, "nextval");

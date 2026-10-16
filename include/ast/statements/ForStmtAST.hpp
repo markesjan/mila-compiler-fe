@@ -16,7 +16,7 @@ public:
                std::string name,
                UPtrExpr start,
                UPtrExpr stop,
-               Token direction,
+               TokenKind direction,
                UPtrStmt loopStmt);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
@@ -24,7 +24,7 @@ private:
     std::string name;
     UPtrExpr start;
     UPtrExpr stop;
-    Token direction;
+    TokenKind direction;
     UPtrStmt loopStmt;
 };
 
