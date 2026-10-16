@@ -2,12 +2,54 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <unordered_map>
 
+#include "Diagnostic.hpp"
 #include "Token.hpp"
 
 namespace milan {
 
-int Lexer::nextToken() {
+namespace {
+
+const std::unordered_map<std::string_view, TokenKind> keywords = {
+    {"program", TokenKind::Program},
+    {"begin", TokenKind::Begin},
+    {"end", TokenKind::End},
+    {"if", TokenKind::If},
+    {"then", TokenKind::Then},
+    {"else", TokenKind::Else},
+    {"while", TokenKind::While},
+    {"do", TokenKind::Do},
+    {"var", TokenKind::Var},
+    {"const", TokenKind::Const},
+    {"integer", TokenKind::Integer},
+    {"boolean", TokenKind::Boolean},
+    {"real", TokenKind::Real},
+    {"function", TokenKind::Function},
+    {"procedure", TokenKind::Procedure},
+    {"forward", TokenKind::Forward},
+    {"for", TokenKind::For},
+    {"to", TokenKind::To},
+    {"downto", TokenKind::Downto},
+    {"div", TokenKind::Div},
+    {"mod", TokenKind::Mod},
+    {"and", TokenKind::And},
+    {"or", TokenKind::Or},
+    {"not", TokenKind::Not},
+    {"xor", TokenKind::Xor},
+    {"exit", TokenKind::Exit},
+    {"break", TokenKind::Break},
+    {"continue", TokenKind::Continue},
+    {"array", TokenKind::Array},
+    {"of", TokenKind::Of},
+    {"true", TokenKind::True},
+    {"false", TokenKind::False}};
+
+}
+
+Lexer::Lexer(std::istream& input) : input(input) {}
+
+Token Lexer::nextToken() {
     while (std::isspace(lastChar) || lastChar == '{') {
         if (lastChar == '{') {
             do {
@@ -18,65 +60,64 @@ int Lexer::nextToken() {
         lastChar = readNextChar();
     }
 
-    tokRow = currRow;
-    tokCol = currCol;
+    SourceLocation tokLoc = currLoc;
 
     if (std::isalpha(lastChar) || lastChar == '_')
-        return tokenizeKeyword();
+        return tokenizeKeywordOrIdentifier(tokLoc);
     if (std::isdigit(lastChar) || lastChar == '$' || lastChar == '&')
-        return tokenizeNumber();
-    if (lastChar == ':' || lastChar == '<' || lastChar == '>' || lastChar == '.')
-        return tokenizeOperator();
+        return tokenizeNumber(tokLoc);
     if (lastChar == EOF)
-        return tok_eof;
+        return Token{TokenKind::Eof, tokLoc, "", 0};
 
-    int currChar = lastChar;
-    lastChar = readNextChar();
-    return currChar;
+    return tokenizeOperator(tokLoc);
 }
 
-const std::string& Lexer::getIdentifierStr() const {
-    return this->identifierStr;
+int Lexer::readNextChar() {
+    int ch = input.get();
+
+    if (ch == '\n') {
+        ++currLoc.line;
+        currLoc.column = 0;
+    } else if (ch != EOF) {
+        ++currLoc.column;
+    }
+
+    return ch;
 }
 
-int Lexer::getNumVal() const {
-    return this->numVal;
+bool Lexer::match(char expected) {
+    if (lastChar == expected) {
+        lastChar = readNextChar();
+        return true;
+    }
+    return false;
 }
 
-int Lexer::getRow() const {
-    return tokRow;
-}
+Token Lexer::tokenizeKeywordOrIdentifier(SourceLocation loc) {
+    std::string identifierStr;
+    identifierStr += static_cast<char>(lastChar);
 
-int Lexer::getCol() const {
-    return tokCol;
-}
-
-int Lexer::tokenizeKeyword() {
-    identifierStr = static_cast<char>(lastChar);
     while (std::isalnum(lastChar = readNextChar()) || lastChar == '_')
         identifierStr += static_cast<char>(lastChar);
 
-    std::transform(identifierStr.begin(), identifierStr.end(), identifierStr.begin(),
-                   [](const char c) { return std::tolower(c); });
+    std::ranges::transform(identifierStr, identifierStr.begin(),
+                           [](unsigned char c) { return std::tolower(c); });
 
     auto it = keywords.find(identifierStr);
     if (it != keywords.end())
-        return it->second;
+        return Token{it->second, loc, identifierStr, 0};
 
-    return tok_identifier;
+    return Token{TokenKind::Identifier, loc, identifierStr, 0};
 }
 
-int Lexer::tokenizeNumber() {
+Token Lexer::tokenizeNumber(SourceLocation loc) {
     std::string numStr;
     int base = 10;
 
-    if (lastChar == '$') {
+    if (match('$'))
         base = 16;
-        lastChar = readNextChar();
-    } else if (lastChar == '&') {
+    else if (match('&'))
         base = 8;
-        lastChar = readNextChar();
-    }
 
     while (std::isalnum(lastChar)) {
         bool valid = false;
@@ -86,9 +127,8 @@ int Lexer::tokenizeNumber() {
             valid = true;
 
         if (!valid) {
-            std::cerr << "Lexical error: Invalid digit '" << static_cast<char>(lastChar)
-                      << "' for base " << base << std::endl;
-            return tok_error;
+            Diagnostic::error(loc, "Invalid digit");
+            return Token{TokenKind::Error, loc, numStr, 0};
         }
 
         numStr += static_cast<char>(lastChar);
@@ -96,75 +136,68 @@ int Lexer::tokenizeNumber() {
     }
 
     if (numStr.empty()) {
-        std::cerr << "Lexical error: Empty numeric literal" << std::endl;
-        return tok_error;
+        Diagnostic::error(loc, "Empty numeric literal");
+        return Token{TokenKind::Error, loc, numStr, 0};
     }
 
     try {
-        numVal = std::stoi(numStr, nullptr, base);
+        std::int32_t numVal = std::stoi(numStr, nullptr, base);
+        return Token{TokenKind::Number, loc, numStr, numVal};
     } catch (...) {
-        std::cerr << "Lexical error: Number out of range" << std::endl;
-        return tok_error;
+        Diagnostic::error(loc, "Number out of range");
+        return Token{TokenKind::Error, loc, numStr, 0};
     }
-
-    return tok_number;
 }
 
-int Lexer::tokenizeOperator() {
-    if (lastChar == ':') {
-        lastChar = readNextChar();
-        if (lastChar == '=') {
-            lastChar = readNextChar();
-            return tok_assign;
-        }
-        return ':';
+Token Lexer::tokenizeOperator(SourceLocation loc) {
+    auto makeToken = [&](TokenKind kind, std::string_view text) {
+        return Token{kind, loc, std::string(text), 0};
+    };
+
+    char c = static_cast<char>(lastChar);
+    lastChar = readNextChar();
+
+    switch (c) {
+        // Single character
+        case '+':
+            return makeToken(TokenKind::Plus, "+");
+        case '-':
+            return makeToken(TokenKind::Minus, "-");
+        case '*':
+            return makeToken(TokenKind::Star, "*");
+        case '=':
+            return makeToken(TokenKind::Equal, "=");
+        case '(':
+            return makeToken(TokenKind::LParen, "(");
+        case ')':
+            return makeToken(TokenKind::RParen, ")");
+        case '[':
+            return makeToken(TokenKind::LBracket, "[");
+        case ']':
+            return makeToken(TokenKind::RBracket, "]");
+        case ',':
+            return makeToken(TokenKind::Comma, ",");
+        case ';':
+            return makeToken(TokenKind::Semicolon, ";");
+        // Double character
+        case ':':
+            return match('=') ? makeToken(TokenKind::Assign, ":=")
+                              : makeToken(TokenKind::Colon, ":");
+        case '>':
+            return match('=') ? makeToken(TokenKind::GreaterEqual, ">=")
+                              : makeToken(TokenKind::Greater, ">");
+        case '.':
+            return match('.') ? makeToken(TokenKind::Range, "..") : makeToken(TokenKind::Dot, ".");
+        case '<':
+            if (match('>'))
+                return makeToken(TokenKind::NotEqual, "<>");
+            if (match('='))
+                return makeToken(TokenKind::LessEqual, "<=");
+            return makeToken(TokenKind::Less, "<");
+        default:
+            Diagnostic::error(loc, "Unexpected character");
+            return makeToken(TokenKind::Error, std::string(1, c));
     }
-
-    if (lastChar == '<') {
-        lastChar = readNextChar();
-        if (lastChar == '>') {
-            lastChar = readNextChar();
-            return tok_notequal;
-        }
-        if (lastChar == '=') {
-            lastChar = readNextChar();
-            return tok_lessequal;
-        }
-        return '<';
-    }
-
-    if (lastChar == '>') {
-        lastChar = readNextChar();
-        if (lastChar == '=') {
-            lastChar = readNextChar();
-            return tok_greaterequal;
-        }
-        return '>';
-    }
-
-    if (lastChar == '.') {
-        lastChar = readNextChar();
-        if (lastChar == '.') {
-            lastChar = readNextChar();
-            return tok_range;
-        }
-        return '.';
-    }
-
-    return tok_error;
-}
-
-int Lexer::readNextChar() {
-    int ch = std::cin.get();
-
-    if (ch == '\n') {
-        ++currRow;
-        currCol = 0;
-    } else if (ch != EOF) {
-        ++currCol;
-    }
-
-    return ch;
 }
 
 } // namespace milan

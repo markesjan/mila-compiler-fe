@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <unordered_map>
 
 #include "Token.hpp"
 
@@ -9,63 +8,19 @@ namespace milan {
 
 class Lexer {
 public:
-    Lexer() = default;
-    ~Lexer() = default;
-
-    int nextToken();
-
-    const std::string& getIdentifierStr() const;
-    int getNumVal() const;
-    int getRow() const;
-    int getCol() const;
+    explicit Lexer(std::istream& input = std::cin);
+    Token nextToken();
 
 private:
-    std::string identifierStr;
-    int numVal;
+    std::istream& input;
     int lastChar = ' ';
+    SourceLocation currLoc{1, 0};
 
-    int currRow = 1;
-    int currCol = 0;
-    int tokRow = 1;
-    int tokCol = 0;
-
-    int tokenizeKeyword();
-    int tokenizeNumber();
-    int tokenizeOperator();
     int readNextChar();
-
-    inline static const std::unordered_map<std::string, Token> keywords = {
-        {"program", tok_program},
-        {"begin", tok_begin},
-        {"end", tok_end},
-        {"if", tok_if},
-        {"then", tok_then},
-        {"else", tok_else},
-        {"while", tok_while},
-        {"do", tok_do},
-        {"var", tok_var},
-        {"const", tok_const},
-        {"integer", tok_integer},
-        {"boolean", tok_boolean},
-        {"real", tok_real},
-        {"function", tok_function},
-        {"procedure", tok_procedure},
-        {"for", tok_for},
-        {"to", tok_to},
-        {"downto", tok_downto},
-        {"div", tok_div},
-        {"mod", tok_mod},
-        {"and", tok_and},
-        {"or", tok_or},
-        {"not", tok_not},
-        {"xor", tok_xor},
-        {"exit", tok_exit},
-        {"break", tok_break},
-        {"continue", tok_continue},
-        {"array", tok_array},
-        {"of", tok_of},
-        {"true", tok_true},
-        {"false", tok_false}};
+    bool match(char expected);
+    Token tokenizeKeywordOrIdentifier(SourceLocation loc);
+    Token tokenizeNumber(SourceLocation loc);
+    Token tokenizeOperator(SourceLocation loc);
 };
 
 } // namespace milan
