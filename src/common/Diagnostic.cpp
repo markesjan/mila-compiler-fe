@@ -4,7 +4,7 @@
 
 namespace milan {
 
-void Diagnostic::log(LogLevel level, int row, int col, std::string_view msg) {
+void Diagnostic::log(LogLevel level, SourceLocation loc, std::string_view msg) {
     std::string_view color = "\033[0m";
     std::string_view label = "info";
 
@@ -30,22 +30,27 @@ void Diagnostic::log(LogLevel level, int row, int col, std::string_view msg) {
             break;
     }
 
-    if (row > 0)
-        std::println(stderr, "\033[1m[{}:{}]\033[0m {}{}:\033[0m {}", row, col, color, label, msg);
+    if (loc.line > 0)
+        std::println(stderr, "\033[1m[{}:{}]\033[0m {}{}:\033[0m {}", loc.line, loc.column, color,
+                     label, msg);
     else
         std::println(stderr, "{}{}:\033[0m {}", color, label, msg);
 }
 
-void Diagnostic::error(int row, int col, std::string_view msg) {
-    log(LogLevel::Error, row, col, msg);
+void Diagnostic::error(std::string_view msg) {
+    error(SourceLocation(0, 0), msg);
 }
 
-void Diagnostic::warning(int row, int col, std::string_view msg) {
-    log(LogLevel::Warning, row, col, msg);
+void Diagnostic::error(SourceLocation loc, std::string_view msg) {
+    log(LogLevel::Error, loc, msg);
 }
 
-void Diagnostic::note(int row, int col, std::string_view msg) {
-    log(LogLevel::Note, row, col, msg);
+void Diagnostic::warning(SourceLocation loc, std::string_view msg) {
+    log(LogLevel::Warning, loc, msg);
+}
+
+void Diagnostic::note(SourceLocation loc, std::string_view msg) {
+    log(LogLevel::Note, loc, msg);
 }
 
 bool Diagnostic::hasErrors() {
