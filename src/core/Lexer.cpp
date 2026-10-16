@@ -164,7 +164,7 @@ Token Lexer::tokenizeOperator(SourceLocation loc) {
         case '-':
             return makeToken(TokenKind::Minus, "-");
         case '*':
-            return makeToken(TokenKind::Star, "*");
+            return makeToken(TokenKind::Mul, "*");
         case '=':
             return makeToken(TokenKind::Equal, "=");
         case '(':

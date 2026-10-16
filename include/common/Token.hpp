@@ -39,7 +39,7 @@ enum class TokenKind : std::uint8_t {
     Of,
     Plus,
     Minus,
-    Star,
+    Mul,
     Div,
     Mod,
     And,
