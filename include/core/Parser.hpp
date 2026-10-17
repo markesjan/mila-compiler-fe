@@ -23,20 +23,20 @@ public:
 
 private:
     Lexer lexer;
-    int currTok;
+    Token currTok;
     std::unique_ptr<Program> programAST;
 
     llvm::LLVMContext MilaContext;
     llvm::IRBuilder<> MilaBuilder;
     llvm::Module MilaModule;
 
-    int getNextToken();
-    bool match(int expectedToken);
+    Token getNextToken();
+    bool match(TokenKind expected);
+    bool expect(TokenKind expected, std::string_view ctx = "");
+    std::string formatCurrentToken() const;
+
     bool parseProgram();
     std::optional<Type> parseType();
-    bool expect(int expectedTok, std::string_view ctx = "");
-    std::string formatCurrentToken() const;
-    static std::string tokenToString(int tok);
 
     std::vector<UPtrDecl> parseConstSection();
     std::vector<UPtrDecl> parseVarSection();
@@ -52,24 +52,7 @@ private:
     UPtrExpr parseSimpleExpr();
     UPtrExpr parseTerm();
     UPtrExpr parseFactor();
-    UPtrExpr parseFactorIdentifier(int row, int col);
-
-    inline static const std::unordered_map<int, std::string_view> tokenNames = {
-        {tok_eof, "end of file"}, {tok_identifier, "identifier"},
-        {tok_number, "number"},   {tok_begin, "begin"},
-        {tok_end, "end"},         {tok_if, "if"},
-        {tok_then, "then"},       {tok_else, "else"},
-        {tok_while, "while"},     {tok_do, "do"},
-        {tok_for, "for"},         {tok_to, "to"},
-        {tok_downto, "downto"},   {tok_var, "var"},
-        {tok_const, "const"},     {tok_integer, "integer"},
-        {tok_assign, ":="},       {tok_notequal, "<>"},
-        {tok_lessequal, "<="},    {tok_greaterequal, ">="},
-        {tok_break, "break"},     {tok_continue, "continue"},
-        {tok_exit, "exit"},       {tok_array, "array"},
-        {tok_of, "of"},           {tok_range, ".."},
-        {tok_boolean, "boolean"}, {tok_true, "true"},
-        {tok_false, "false"}};
+    UPtrExpr parseFactorIdentifier(SourceLocation loc);
 };
 
 } // namespace milan

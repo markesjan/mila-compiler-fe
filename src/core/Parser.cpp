@@ -46,12 +46,12 @@ const llvm::Module& Parser::generate() {
     return this->MilaModule;
 }
 
-int Parser::getNextToken() {
+Token Parser::getNextToken() {
     return currTok = lexer.nextToken();
 }
 
-bool Parser::match(int expectedToken) {
-    if (currTok == expectedToken) {
+bool Parser::match(TokenKind expected) {
+    if (currTok.is(expected)) {
         getNextToken();
         return true;
     }
@@ -59,30 +59,54 @@ bool Parser::match(int expectedToken) {
     return false;
 }
 
+bool Parser::expect(TokenKind expected, std::string_view ctx) {
+    if (currTok.isNot(expected)) {
+        std::string msg = ctx.empty()
+                              ? std::format("Expected '{}', but got {}",
+                                            tokenKindToString(expected), formatCurrentToken())
+                              : std::format("Expected '{}', but got {} in {}",
+                                            tokenKindToString(expected), formatCurrentToken(), ctx);
+
+        Diagnostic::error(currTok.location, msg);
+        return false;
+    }
+
+    getNextToken();
+    return true;
+}
+
+std::string Parser::formatCurrentToken() const {
+    if (currTok.is(TokenKind::Identifier))
+        return std::format("identifier '{}'", currTok.text);
+    if (currTok.is(TokenKind::Number))
+        return std::format("number '{}'", currTok.numberValue);
+
+    return std::format("'{}'", currTok.name());
+}
+
 bool Parser::parseProgram() {
-    if (currTok != tok_program)
+    if (currTok.isNot(TokenKind::Program))
         return false;
 
     getNextToken();
 
-    if (currTok != tok_identifier)
+    if (currTok.isNot(TokenKind::Identifier))
         return false;
 
-    std::string programName = lexer.getIdentifierStr();
+    std::string programName = currTok.text;
     getNextToken();
 
-    if (!expect(';', "program header"))
+    if (!expect(TokenKind::Semicolon, "program header"))
         return false;
 
     std::vector<UPtrDecl> decls;
-    while (currTok == tok_const || currTok == tok_var) {
-        if (currTok == tok_const) {
+    while (currTok.is(TokenKind::Const) || currTok.is(TokenKind::Var)) {
+        if (currTok.is(TokenKind::Const)) {
             auto constDecls = parseConstSection();
-            std::move(constDecls.begin(), constDecls.end(), std::back_inserter(decls));
-        }
-        if (currTok == tok_var) {
+            std::ranges::move(constDecls, std::back_inserter(decls));
+        } else if (currTok.is(TokenKind::Var)) {
             auto varDecls = parseVarSection();
-            std::move(varDecls.begin(), varDecls.end(), std::back_inserter(decls));
+            std::ranges::move(varDecls, std::back_inserter(decls));
         }
     }
 
@@ -90,7 +114,7 @@ bool Parser::parseProgram() {
     if (!mainBlock)
         return false;
 
-    if (!expect('.', "end of program"))
+    if (!expect(TokenKind::Dot, "end of program"))
         return false;
 
     this->programAST =
@@ -100,35 +124,35 @@ bool Parser::parseProgram() {
 }
 
 std::optional<Type> Parser::parseType() {
-    if (currTok == tok_integer) {
+    if (currTok.is(TokenKind::Integer)) {
         getNextToken();
         return Type(BaseType::Int);
     }
 
-    if (currTok == tok_boolean) {
+    if (currTok.is(TokenKind::Boolean)) {
         getNextToken();
         return Type(BaseType::Bool);
     }
 
-    if (currTok == tok_array) {
+    if (currTok.is(TokenKind::Array)) {
         getNextToken();
 
-        if (!expect('[', "array declaration"))
+        if (!expect(TokenKind::LBracket, "array declaration"))
             return std::nullopt;
 
         auto parseBound = [&]() -> std::optional<int> {
             bool isNeg = false;
-            if (currTok == '-') {
+            if (currTok.is(TokenKind::Minus)) {
                 isNeg = true;
                 getNextToken();
             }
 
-            if (currTok != tok_number) {
-                Diagnostic::error(lexer.getRow(), lexer.getCol(), "Expected number in array range");
+            if (currTok.isNot(TokenKind::Number)) {
+                Diagnostic::error(currTok.location, "Expected number in array range");
                 return std::nullopt;
             }
 
-            int val = lexer.getNumVal();
+            int val = currTok.numberValue;
             if (isNeg)
                 val = -val;
 
@@ -140,93 +164,57 @@ std::optional<Type> Parser::parseType() {
         if (!low)
             return std::nullopt;
 
-        if (!expect(tok_range, "array range"))
+        if (!expect(TokenKind::Range, "array range"))
             return std::nullopt;
 
         auto high = parseBound();
         if (!high)
             return std::nullopt;
 
-        if (!expect(']', "array declaration"))
+        if (!expect(TokenKind::RBracket, "array declaration"))
             return std::nullopt;
-        if (!expect(tok_of, "array declaration"))
+        if (!expect(TokenKind::Of, "array declaration"))
             return std::nullopt;
 
         BaseType elemType = BaseType::Int;
-        if (currTok == tok_integer) {
+        if (currTok.is(TokenKind::Integer)) {
             elemType = BaseType::Int;
             getNextToken();
-        } else if (currTok == tok_boolean) {
+        } else if (currTok.is(TokenKind::Boolean)) {
             elemType = BaseType::Bool;
             getNextToken();
         } else {
-            Diagnostic::error(lexer.getRow(), lexer.getCol(), "Unknown array element type");
+            Diagnostic::error(currTok.location, "Unknown array element type");
             return std::nullopt;
         }
 
         return Type::createArray(*low, *high, elemType);
     }
 
-    Diagnostic::error(lexer.getRow(), lexer.getCol(), "Expected type in variable declaration");
+    Diagnostic::error(currTok.location, "Expected type in variable declaration");
     return std::nullopt;
-}
-
-bool Parser::expect(int expectedTok, std::string_view ctx) {
-    if (currTok != expectedTok) {
-        std::string msg = ctx.empty()
-                              ? std::format("Expected '{}', but got {}", tokenToString(expectedTok),
-                                            formatCurrentToken())
-                              : std::format("Expected '{}', but got {} in {}",
-                                            tokenToString(expectedTok), formatCurrentToken(), ctx);
-
-        Diagnostic::error(lexer.getRow(), lexer.getCol(), msg);
-        return false;
-    }
-
-    getNextToken();
-    return true;
-}
-
-std::string Parser::formatCurrentToken() const {
-    if (currTok == tok_identifier)
-        return std::format("identifier '{}'", lexer.getIdentifierStr());
-    if (currTok == tok_number)
-        return std::format("number '{}'", lexer.getNumVal());
-
-    return std::format("'{}'", tokenToString(currTok));
-}
-
-std::string Parser::tokenToString(int tok) {
-    if (tok >= 0 && tok < 128)
-        return std::string(1, static_cast<char>(tok));
-
-    auto it = tokenNames.find(tok);
-    if (it != tokenNames.end())
-        return std::string(it->second);
-
-    return "unknown token (" + std::to_string(tok) + ")";
 }
 
 std::vector<UPtrDecl> Parser::parseConstSection() {
     std::vector<UPtrDecl> decls;
 
     getNextToken();
-    while (currTok == tok_identifier) {
-        int row = lexer.getRow(), col = lexer.getCol();
-        std::string name = lexer.getIdentifierStr();
+    while (currTok.is(TokenKind::Identifier)) {
+        SourceLocation loc = currTok.location;
+        std::string name = currTok.text;
         getNextToken();
 
-        if (!expect('=', "constant declaration"))
+        if (!expect(TokenKind::Equal, "constant declaration"))
             return decls;
 
         auto expr = parseExpression();
         if (!expr)
             return decls;
 
-        if (!expect(';', "constant declaration"))
+        if (!expect(TokenKind::Semicolon, "constant declaration"))
             return decls;
 
-        decls.push_back(std::make_unique<ConstantDeclAST>(row, col, name, std::move(expr)));
+        decls.push_back(std::make_unique<ConstantDeclAST>(loc, std::move(name), std::move(expr)));
     }
 
     return decls;
@@ -236,65 +224,65 @@ std::vector<UPtrDecl> Parser::parseVarSection() {
     std::vector<UPtrDecl> decls;
 
     getNextToken();
-    while (currTok == tok_identifier) {
-        int row = lexer.getRow(), col = lexer.getCol();
+    while (currTok.is(TokenKind::Identifier)) {
+        SourceLocation loc = currTok.location;
         std::vector<std::string> names;
-        names.push_back(lexer.getIdentifierStr());
+        names.push_back(currTok.text);
         getNextToken();
 
-        while (match(',')) {
-            if (currTok != tok_identifier) {
-                Diagnostic::error(lexer.getRow(), lexer.getCol(),
+        while (match(TokenKind::Comma)) {
+            if (currTok.isNot(TokenKind::Identifier)) {
+                Diagnostic::error(currTok.location,
                                   "Expected identifier after ',' in variable declaration");
                 return decls;
             }
-            names.push_back(lexer.getIdentifierStr());
+            names.push_back(currTok.text);
             getNextToken();
         }
 
-        if (!expect(':', "variable declaration"))
+        if (!expect(TokenKind::Colon, "variable declaration"))
             return decls;
 
         auto typeOpt = parseType();
         if (!typeOpt)
             return decls;
 
-        if (!expect(';', "variable declaration"))
+        if (!expect(TokenKind::Semicolon, "variable declaration"))
             return decls;
 
-        decls.push_back(std::make_unique<VariableDeclAST>(row, col, names, *typeOpt));
+        decls.push_back(std::make_unique<VariableDeclAST>(loc, std::move(names), *typeOpt));
     }
 
     return decls;
 }
 
 UPtrStmt Parser::parseBlock() {
-    int row = lexer.getRow(), col = lexer.getCol();
+    SourceLocation loc = currTok.location;
 
-    if (currTok != tok_begin)
+    if (currTok.isNot(TokenKind::Begin))
         return nullptr;
 
     getNextToken();
 
     std::vector<UPtrStmt> stmts = parseStatements();
 
-    if (!expect(tok_end, "block"))
+    if (!expect(TokenKind::End, "block"))
         return nullptr;
 
-    return std::make_unique<CompoundStmtAST>(row, col, std::move(stmts));
+    return std::make_unique<CompoundStmtAST>(loc, std::move(stmts));
 }
 
 std::vector<UPtrStmt> Parser::parseStatements() {
     std::vector<UPtrStmt> stmts;
 
-    while (currTok != tok_end && currTok != tok_eof) {
+    while (currTok.isNot(TokenKind::End) && currTok.isNot(TokenKind::Eof)) {
         auto stmt = parseStatement();
         if (!stmt)
             return {};
 
         stmts.push_back(std::move(stmt));
 
-        if (currTok == ';')
+        if (currTok.is(TokenKind::Semicolon))
             getNextToken();
         else
             break;
@@ -304,119 +292,120 @@ std::vector<UPtrStmt> Parser::parseStatements() {
 }
 
 UPtrStmt Parser::parseStatement() {
-    int row = lexer.getRow(), col = lexer.getCol();
+    SourceLocation loc = currTok.location;
 
-    if (currTok == tok_if)
+    if (currTok.is(TokenKind::If))
         return parseIfStatement();
-    if (currTok == tok_while)
+    if (currTok.is(TokenKind::While))
         return parseWhileStatement();
-    if (currTok == tok_for)
+    if (currTok.is(TokenKind::For))
         return parseForStatement();
 
-    if (currTok == tok_break) {
+    if (currTok.is(TokenKind::Break)) {
         getNextToken();
-        return std::make_unique<BreakStmtAST>(row, col);
+        return std::make_unique<BreakStmtAST>(loc);
     }
-    if (currTok == tok_continue) {
+    if (currTok.is(TokenKind::Continue)) {
         getNextToken();
-        return std::make_unique<ContinueStmtAST>(row, col);
+        return std::make_unique<ContinueStmtAST>(loc);
     }
-    if (currTok == tok_exit) {
+    if (currTok.is(TokenKind::Exit)) {
         getNextToken();
-        return std::make_unique<ExitStmtAST>(row, col);
+        return std::make_unique<ExitStmtAST>(loc);
     }
 
-    if (currTok == tok_identifier) {
-        std::string name = lexer.getIdentifierStr();
+    if (currTok.is(TokenKind::Identifier)) {
+        std::string name = currTok.text;
         getNextToken();
 
         // Assignment to array element
-        if (currTok == '[') {
+        if (currTok.is(TokenKind::LBracket)) {
             getNextToken();
 
             auto indexExpr = parseExpression();
             if (!indexExpr)
                 return nullptr;
 
-            if (!match(']'))
+            if (!match(TokenKind::RBracket))
                 return nullptr;
 
-            if (!match(tok_assign))
+            if (!match(TokenKind::Assign))
                 return nullptr;
 
             auto valExpr = parseExpression();
             if (!valExpr)
                 return nullptr;
 
-            return std::make_unique<AssignStmtAST>(row, col, name, std::move(valExpr),
+            return std::make_unique<AssignStmtAST>(loc, std::move(name), std::move(valExpr),
                                                    std::move(indexExpr));
         }
 
         // Assignment to simple variable
-        if (currTok == tok_assign) {
+        if (currTok.is(TokenKind::Assign)) {
             getNextToken();
 
             auto valExpr = parseExpression();
             if (!valExpr)
                 return nullptr;
 
-            return std::make_unique<AssignStmtAST>(row, col, name, std::move(valExpr), nullptr);
+            return std::make_unique<AssignStmtAST>(loc, std::move(name), std::move(valExpr),
+                                                   nullptr);
         }
 
         if (name == "inc" || name == "dec") {
-            if (!match('('))
+            if (!match(TokenKind::LParen))
                 return nullptr;
 
-            if (currTok != tok_identifier) {
-                Diagnostic::error(lexer.getRow(), lexer.getCol(),
+            if (currTok.isNot(TokenKind::Identifier)) {
+                Diagnostic::error(currTok.location,
                                   std::format("Expected variable identifier in {}()", name));
                 return nullptr;
             }
 
-            std::string targetVar = lexer.getIdentifierStr();
+            std::string targetVar = currTok.text;
             getNextToken();
 
             UPtrExpr stepExpr = nullptr;
-            if (match(',')) {
+            if (match(TokenKind::Comma)) {
                 stepExpr = parseExpression();
                 if (!stepExpr)
                     return nullptr;
             } else {
-                stepExpr = std::make_unique<NumberExprAST>(row, col, 1);
+                stepExpr = std::make_unique<NumberExprAST>(loc, 1);
             }
 
-            if (!expect(')', name))
+            if (!expect(TokenKind::RParen, name))
                 return nullptr;
 
-            Token op = (name == "inc") ? static_cast<Token>('+') : static_cast<Token>('-');
-            auto varExpr = std::make_unique<VariableExprAST>(row, col, targetVar);
-            auto binOp = std::make_unique<BinaryOpExprAST>(row, col, op, std::move(varExpr),
-                                                           std::move(stepExpr));
-            return std::make_unique<AssignStmtAST>(row, col, targetVar, std::move(binOp), nullptr);
+            TokenKind op = (name == "inc") ? TokenKind::Plus : TokenKind::Minus;
+            auto varExpr = std::make_unique<VariableExprAST>(loc, targetVar);
+            auto binOp =
+                std::make_unique<BinaryOpExprAST>(loc, op, std::move(varExpr), std::move(stepExpr));
+            return std::make_unique<AssignStmtAST>(loc, std::move(targetVar), std::move(binOp),
+                                                   nullptr);
         }
 
         if (name == "readln") {
-            if (!match('('))
+            if (!match(TokenKind::LParen))
                 return nullptr;
-            if (currTok != tok_identifier)
+            if (currTok.isNot(TokenKind::Identifier))
                 return nullptr;
 
-            std::string readVarName = lexer.getIdentifierStr();
-
+            std::string readVarName = currTok.text;
             getNextToken();
 
-            if (!expect(')', "readln"))
+            if (!expect(TokenKind::RParen, "readln"))
                 return nullptr;
 
-            return std::make_unique<ReadlnStmtAST>(row, col, readVarName);
+            return std::make_unique<ReadlnStmtAST>(loc, std::move(readVarName));
         }
 
         // Procedure call
         std::vector<UPtrExpr> args;
-        if (currTok == '(') {
+        if (currTok.is(TokenKind::LParen)) {
             getNextToken();
 
-            if (currTok != ')') {
+            if (currTok.isNot(TokenKind::RParen)) {
                 while (true) {
                     auto arg = parseExpression();
                     if (!arg)
@@ -424,9 +413,9 @@ UPtrStmt Parser::parseStatement() {
 
                     args.push_back(std::move(arg));
 
-                    if (currTok == ')')
+                    if (currTok.is(TokenKind::RParen))
                         break;
-                    if (!match(','))
+                    if (!match(TokenKind::Comma))
                         return nullptr;
                 }
             }
@@ -434,18 +423,18 @@ UPtrStmt Parser::parseStatement() {
             getNextToken();
         }
 
-        return std::make_unique<CallStmtAST>(row, col, name, std::move(args));
+        return std::make_unique<CallStmtAST>(loc, std::move(name), std::move(args));
     }
 
-    if (currTok == tok_begin)
+    if (currTok.is(TokenKind::Begin))
         return parseBlock();
 
     // Empty statement
-    return std::make_unique<EmptyStmtAST>(row, col);
+    return std::make_unique<EmptyStmtAST>(loc);
 }
 
 UPtrStmt Parser::parseIfStatement() {
-    int row = lexer.getRow(), col = lexer.getCol();
+    SourceLocation loc = currTok.location;
 
     getNextToken();
 
@@ -453,7 +442,7 @@ UPtrStmt Parser::parseIfStatement() {
     if (!cond)
         return nullptr;
 
-    if (!expect(tok_then, "if statement"))
+    if (!expect(TokenKind::Then, "if statement"))
         return nullptr;
 
     UPtrStmt thenStmt = parseStatement();
@@ -461,7 +450,7 @@ UPtrStmt Parser::parseIfStatement() {
         return nullptr;
 
     UPtrStmt elseStmt = nullptr;
-    if (currTok == tok_else) {
+    if (currTok.is(TokenKind::Else)) {
         getNextToken();
 
         elseStmt = parseStatement();
@@ -469,12 +458,12 @@ UPtrStmt Parser::parseIfStatement() {
             return nullptr;
     }
 
-    return std::make_unique<IfStmtAST>(row, col, std::move(cond), std::move(thenStmt),
+    return std::make_unique<IfStmtAST>(loc, std::move(cond), std::move(thenStmt),
                                        std::move(elseStmt));
 }
 
 UPtrStmt Parser::parseWhileStatement() {
-    int row = lexer.getRow(), col = lexer.getCol();
+    SourceLocation loc = currTok.location;
 
     getNextToken();
 
@@ -482,90 +471,92 @@ UPtrStmt Parser::parseWhileStatement() {
     if (!cond)
         return nullptr;
 
-    if (!expect(tok_do, "while loop"))
+    if (!expect(TokenKind::Do, "while loop"))
         return nullptr;
 
     UPtrStmt body = parseStatement();
     if (!body)
         return nullptr;
 
-    return std::make_unique<WhileStmtAST>(row, col, std::move(cond), std::move(body));
+    return std::make_unique<WhileStmtAST>(loc, std::move(cond), std::move(body));
 }
 
 UPtrStmt Parser::parseForStatement() {
-    int row = lexer.getRow(), col = lexer.getCol();
+    SourceLocation loc = currTok.location;
 
     getNextToken();
 
-    if (currTok != tok_identifier) {
-        Diagnostic::error(row, col, std::format("Expected variable identifier in for loop"));
+    if (currTok.isNot(TokenKind::Identifier)) {
+        Diagnostic::error(loc, "Expected variable identifier in for loop");
         return nullptr;
     }
 
-    std::string targetVar = lexer.getIdentifierStr();
+    std::string targetVar = currTok.text;
     getNextToken();
 
-    if (!expect(tok_assign, "for loop"))
+    if (!expect(TokenKind::Assign, "for loop"))
         return nullptr;
 
     UPtrExpr startExpr = parseExpression();
     if (!startExpr)
         return nullptr;
 
-    if (currTok != tok_to && currTok != tok_downto) {
-        Diagnostic::error(lexer.getRow(), lexer.getCol(),
-                          std::format("Expected 'to' or 'downto' in for loop"));
+    if (currTok.isNot(TokenKind::To) && currTok.isNot(TokenKind::Downto)) {
+        Diagnostic::error(currTok.location, "Expected 'to' or 'downto' in for loop");
         return nullptr;
     }
 
-    auto direction = static_cast<Token>(currTok);
+    TokenKind direction = currTok.kind;
     getNextToken();
 
     UPtrExpr stopExpr = parseExpression();
     if (!stopExpr)
         return nullptr;
 
-    if (!expect(tok_do, "for loop"))
+    if (!expect(TokenKind::Do, "for loop"))
         return nullptr;
 
     UPtrStmt body = parseStatement();
     if (!body)
         return nullptr;
 
-    return std::make_unique<ForStmtAST>(row, col, std::move(targetVar), std::move(startExpr),
+    return std::make_unique<ForStmtAST>(loc, std::move(targetVar), std::move(startExpr),
                                         std::move(stopExpr), direction, std::move(body));
 }
 
 UPtrExpr Parser::parseExpression() {
-    int row = lexer.getRow(), col = lexer.getCol();
+    SourceLocation loc = currTok.location;
 
     UPtrExpr lhs = parseSimpleExpr();
     if (!lhs)
         return nullptr;
 
     bool isRel = false;
-    Token relTok = tok_error;
+    TokenKind relTok = TokenKind::Error;
 
-    if (currTok == '=' || currTok == '<' || currTok == '>' || currTok == tok_lessequal ||
-        currTok == tok_greaterequal || currTok == tok_notequal) {
+    if (currTok.is(TokenKind::Equal) || currTok.is(TokenKind::Less) ||
+        currTok.is(TokenKind::Greater) || currTok.is(TokenKind::LessEqual) ||
+        currTok.is(TokenKind::GreaterEqual) || currTok.is(TokenKind::NotEqual)) {
         isRel = true;
-        relTok = static_cast<Token>(currTok);
+        relTok = currTok.kind;
         getNextToken();
     }
 
     if (isRel) {
         UPtrExpr rhs = parseSimpleExpr();
-        lhs = std::make_unique<BinaryOpExprAST>(row, col, relTok, std::move(lhs), std::move(rhs));
+        if (!rhs)
+            return nullptr;
+        lhs = std::make_unique<BinaryOpExprAST>(loc, relTok, std::move(lhs), std::move(rhs));
     }
 
     return lhs;
 }
 
 UPtrExpr Parser::parseSimpleExpr() {
-    int row = lexer.getRow(), col = lexer.getCol();
+    SourceLocation loc = currTok.location;
 
     bool isNeg = false;
-    if (currTok == '-') {
+    if (currTok.is(TokenKind::Minus)) {
         isNeg = true;
         getNextToken();
     }
@@ -574,18 +565,19 @@ UPtrExpr Parser::parseSimpleExpr() {
     if (!lhs)
         return nullptr;
     if (isNeg)
-        lhs = std::make_unique<UnaryOpExprAST>(row, col, static_cast<Token>('-'), std::move(lhs));
+        lhs = std::make_unique<UnaryOpExprAST>(loc, TokenKind::Minus, std::move(lhs));
 
     while (true) {
-        if (currTok == '+' || currTok == '-' || currTok == tok_or || currTok == tok_xor) {
-            auto op = static_cast<Token>(currTok);
+        if (currTok.is(TokenKind::Plus) || currTok.is(TokenKind::Minus) ||
+            currTok.is(TokenKind::Or) || currTok.is(TokenKind::Xor)) {
+            TokenKind op = currTok.kind;
             getNextToken();
 
             UPtrExpr rhs = parseTerm();
             if (!rhs)
                 return nullptr;
 
-            lhs = std::make_unique<BinaryOpExprAST>(row, col, op, std::move(lhs), std::move(rhs));
+            lhs = std::make_unique<BinaryOpExprAST>(loc, op, std::move(lhs), std::move(rhs));
         } else {
             break;
         }
@@ -595,22 +587,23 @@ UPtrExpr Parser::parseSimpleExpr() {
 }
 
 UPtrExpr Parser::parseTerm() {
-    int row = lexer.getRow(), col = lexer.getCol();
+    SourceLocation loc = currTok.location;
 
     UPtrExpr lhs = parseFactor();
     if (!lhs)
         return nullptr;
 
     while (true) {
-        if (currTok == '*' || currTok == tok_div || currTok == tok_mod || currTok == tok_and) {
-            auto op = static_cast<Token>(currTok);
+        if (currTok.is(TokenKind::Mul) || currTok.is(TokenKind::Div) ||
+            currTok.is(TokenKind::Mod) || currTok.is(TokenKind::And)) {
+            TokenKind op = currTok.kind;
             getNextToken();
 
             UPtrExpr rhs = parseFactor();
             if (!rhs)
                 return nullptr;
 
-            lhs = std::make_unique<BinaryOpExprAST>(row, col, op, std::move(lhs), std::move(rhs));
+            lhs = std::make_unique<BinaryOpExprAST>(loc, op, std::move(lhs), std::move(rhs));
         } else {
             break;
         }
@@ -620,41 +613,41 @@ UPtrExpr Parser::parseTerm() {
 }
 
 UPtrExpr Parser::parseFactor() {
-    int row = lexer.getRow(), col = lexer.getCol();
+    SourceLocation loc = currTok.location;
 
-    if (currTok == tok_identifier)
-        return parseFactorIdentifier(row, col);
+    if (currTok.is(TokenKind::Identifier))
+        return parseFactorIdentifier(loc);
 
-    if (currTok == tok_number) {
-        auto numExpr = std::make_unique<NumberExprAST>(row, col, lexer.getNumVal());
+    if (currTok.is(TokenKind::Number)) {
+        auto numExpr = std::make_unique<NumberExprAST>(loc, currTok.numberValue);
         getNextToken();
         return numExpr;
     }
 
-    if (currTok == tok_true || currTok == tok_false) {
-        bool val = (currTok == tok_true);
+    if (currTok.is(TokenKind::True) || currTok.is(TokenKind::False)) {
+        bool val = currTok.is(TokenKind::True);
         getNextToken();
-        return std::make_unique<BooleanExprAST>(row, col, val);
+        return std::make_unique<BooleanExprAST>(loc, val);
     }
 
-    if (currTok == tok_not) {
+    if (currTok.is(TokenKind::Not)) {
         getNextToken();
 
         auto factor = parseFactor();
         if (!factor)
             return nullptr;
 
-        return std::make_unique<UnaryOpExprAST>(row, col, tok_not, std::move(factor));
+        return std::make_unique<UnaryOpExprAST>(loc, TokenKind::Not, std::move(factor));
     }
 
-    if (currTok == '(') {
+    if (currTok.is(TokenKind::LParen)) {
         getNextToken();
 
         auto expr = parseExpression();
         if (!expr)
             return nullptr;
 
-        if (!expect(')', "expression"))
+        if (!expect(TokenKind::RParen, "expression"))
             return nullptr;
 
         return expr;
@@ -663,30 +656,30 @@ UPtrExpr Parser::parseFactor() {
     return nullptr;
 }
 
-UPtrExpr Parser::parseFactorIdentifier(int row, int col) {
-    std::string name = lexer.getIdentifierStr();
+UPtrExpr Parser::parseFactorIdentifier(SourceLocation loc) {
+    std::string name = currTok.text;
     getNextToken();
 
     // Array access
-    if (currTok == '[') {
+    if (currTok.is(TokenKind::LBracket)) {
         getNextToken();
 
         auto indexExpr = parseExpression();
         if (!indexExpr)
             return nullptr;
 
-        if (!expect(']', "array index"))
+        if (!expect(TokenKind::RBracket, "array index"))
             return nullptr;
 
-        return std::make_unique<ArrayAccessExprAST>(row, col, name, std::move(indexExpr));
+        return std::make_unique<ArrayAccessExprAST>(loc, std::move(name), std::move(indexExpr));
     }
 
     // Function call
-    if (currTok == '(') {
+    if (currTok.is(TokenKind::LParen)) {
         getNextToken();
 
         std::vector<UPtrExpr> args;
-        if (currTok != ')') {
+        if (currTok.isNot(TokenKind::RParen)) {
             while (true) {
                 auto arg = parseExpression();
                 if (!arg)
@@ -694,19 +687,19 @@ UPtrExpr Parser::parseFactorIdentifier(int row, int col) {
 
                 args.push_back(std::move(arg));
 
-                if (currTok == ')')
+                if (currTok.is(TokenKind::RParen))
                     break;
-                if (!match(','))
+                if (!match(TokenKind::Comma))
                     return nullptr;
             }
         }
 
         getNextToken();
-        return std::make_unique<CallExprAST>(row, col, name, std::move(args));
+        return std::make_unique<CallExprAST>(loc, std::move(name), std::move(args));
     }
 
     // Variable
-    return std::make_unique<VariableExprAST>(row, col, name);
+    return std::make_unique<VariableExprAST>(loc, std::move(name));
 }
 
 } // namespace milan
