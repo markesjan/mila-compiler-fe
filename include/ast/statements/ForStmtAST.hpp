@@ -5,7 +5,7 @@
 
 #include "ExprAST.hpp"
 #include "StmtAST.hpp"
-#include "Token.hpp"
+#include "TokenKind.hpp"
 
 namespace milan {
 

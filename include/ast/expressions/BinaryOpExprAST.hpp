@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "ExprAST.hpp"
-#include "Token.hpp"
+#include "TokenKind.hpp"
 
 namespace milan {
 
