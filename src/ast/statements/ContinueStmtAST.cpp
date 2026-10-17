@@ -5,7 +5,7 @@
 
 namespace milan {
 
-ContinueStmtAST::ContinueStmtAST(int row, int col) : StmtAST(row, col) {}
+ContinueStmtAST::ContinueStmtAST(SourceLocation loc) : StmtAST(loc) {}
 
 llvm::Value* ContinueStmtAST::codegen(CodegenContext& ctx) {
     if (ctx.loopContinueBlocks.empty())

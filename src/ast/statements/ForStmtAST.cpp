@@ -7,14 +7,13 @@
 
 namespace milan {
 
-ForStmtAST::ForStmtAST(int row,
-                       int col,
+ForStmtAST::ForStmtAST(SourceLocation loc,
                        std::string name,
                        UPtrExpr start,
                        UPtrExpr stop,
                        TokenKind direction,
                        UPtrStmt loopStmt)
-    : StmtAST(row, col),
+    : StmtAST(loc),
       name(std::move(name)),
       start(std::move(start)),
       stop(std::move(stop)),

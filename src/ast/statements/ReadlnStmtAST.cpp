@@ -5,8 +5,8 @@
 
 namespace milan {
 
-ReadlnStmtAST::ReadlnStmtAST(int row, int col, std::string varName)
-    : StmtAST(row, col), varName(std::move(varName)) {}
+ReadlnStmtAST::ReadlnStmtAST(SourceLocation loc, std::string varName)
+    : StmtAST(loc), varName(std::move(varName)) {}
 
 llvm::Value* ReadlnStmtAST::codegen(CodegenContext& ctx) {
     llvm::Function* calleeF = ctx.module.getFunction("readln");

@@ -3,17 +3,20 @@
 #include <llvm/IR/Value.h>
 
 #include "CodegenContext.hpp"
+#include "SourceLocation.hpp"
 
 namespace milan {
 
 class NodeAST {
 public:
-    NodeAST(int row, int col);
+    explicit NodeAST(SourceLocation loc);
     virtual ~NodeAST() = default;
     virtual llvm::Value* codegen(CodegenContext& ctx) = 0;
 
+    SourceLocation getLocation() const noexcept { return loc; }
+
 protected:
-    int row, col;
+    SourceLocation loc;
 };
 
 } // namespace milan

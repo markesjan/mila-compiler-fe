@@ -2,8 +2,8 @@
 
 namespace milan {
 
-CompoundStmtAST::CompoundStmtAST(int row, int col, std::vector<UPtrStmt> stmts)
-    : StmtAST(row, col), stmts(std::move(stmts)) {}
+CompoundStmtAST::CompoundStmtAST(SourceLocation loc, std::vector<UPtrStmt> stmts)
+    : StmtAST(loc), stmts(std::move(stmts)) {}
 
 llvm::Value* CompoundStmtAST::codegen(CodegenContext& ctx) {
     for (auto& stmt : stmts) {

@@ -2,8 +2,8 @@
 
 namespace milan {
 
-AssignStmtAST::AssignStmtAST(int row, int col, std::string name, UPtrExpr val, UPtrExpr idx)
-    : StmtAST(row, col), name(std::move(name)), val(std::move(val)), idx(std::move(idx)) {}
+AssignStmtAST::AssignStmtAST(SourceLocation loc, std::string name, UPtrExpr val, UPtrExpr idx)
+    : StmtAST(loc), name(std::move(name)), val(std::move(val)), idx(std::move(idx)) {}
 
 llvm::Value* AssignStmtAST::codegen(CodegenContext& ctx) {
     llvm::Value* assignedVal = val->codegen(ctx);

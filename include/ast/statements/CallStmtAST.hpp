@@ -11,7 +11,7 @@ namespace milan {
 
 class CallStmtAST : public StmtAST {
 public:
-    CallStmtAST(int row, int col, std::string name, std::vector<UPtrExpr> args);
+    CallStmtAST(SourceLocation loc, std::string name, std::vector<UPtrExpr> args);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

@@ -5,7 +5,7 @@
 
 namespace milan {
 
-BreakStmtAST::BreakStmtAST(int row, int col) : StmtAST(row, col) {}
+BreakStmtAST::BreakStmtAST(SourceLocation loc) : StmtAST(loc) {}
 
 llvm::Value* BreakStmtAST::codegen(CodegenContext& ctx) {
     if (ctx.loopBreakBlocks.empty())

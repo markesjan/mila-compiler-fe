@@ -12,8 +12,7 @@ namespace milan {
 
 class FunctionDeclAST : public DeclAST {
 public:
-    FunctionDeclAST(int row,
-                    int col,
+    FunctionDeclAST(SourceLocation loc,
                     std::string name,
                     Type retType,
                     std::vector<UPtrDecl> params,

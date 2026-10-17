@@ -9,7 +9,7 @@ namespace milan {
 
 class CallExprAST : public ExprAST {
 public:
-    CallExprAST(int row, int col, std::string name, std::vector<UPtrExpr> args);
+    CallExprAST(SourceLocation loc, std::string name, std::vector<UPtrExpr> args);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

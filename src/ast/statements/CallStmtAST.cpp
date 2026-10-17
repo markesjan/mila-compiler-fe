@@ -6,8 +6,8 @@
 
 namespace milan {
 
-CallStmtAST::CallStmtAST(int row, int col, std::string name, std::vector<UPtrExpr> args)
-    : StmtAST(row, col), name(std::move(name)), args(std::move(args)) {}
+CallStmtAST::CallStmtAST(SourceLocation loc, std::string name, std::vector<UPtrExpr> args)
+    : StmtAST(loc), name(std::move(name)), args(std::move(args)) {}
 
 llvm::Value* CallStmtAST::codegen(CodegenContext& ctx) {
     llvm::Function* calleeF = ctx.module.getFunction(name);

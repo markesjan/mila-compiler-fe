@@ -5,8 +5,8 @@
 
 namespace milan {
 
-VariableDeclAST::VariableDeclAST(int row, int col, std::vector<std::string> names, Type type)
-    : DeclAST(row, col), names(std::move(names)), type(type) {}
+VariableDeclAST::VariableDeclAST(SourceLocation loc, std::vector<std::string> names, Type type)
+    : DeclAST(loc), names(std::move(names)), type(type) {}
 
 llvm::Value* VariableDeclAST::codegen(CodegenContext& ctx) {
     llvm::Type* varType = nullptr;

@@ -2,6 +2,6 @@
 
 namespace milan {
 
-NodeAST::NodeAST(int row, int col) : row(row), col(col) {}
+NodeAST::NodeAST(SourceLocation loc) : loc(loc) {}
 
 } // namespace milan

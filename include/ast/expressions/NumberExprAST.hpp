@@ -6,7 +6,7 @@ namespace milan {
 
 class NumberExprAST : public ExprAST {
 public:
-    NumberExprAST(int row, int col, std::int32_t val);
+    NumberExprAST(SourceLocation loc, std::int32_t val);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

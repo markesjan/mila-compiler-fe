@@ -11,8 +11,7 @@ namespace milan {
 
 class ProcedureDeclAST : public DeclAST {
 public:
-    ProcedureDeclAST(int row,
-                     int col,
+    ProcedureDeclAST(SourceLocation loc,
                      std::string name,
                      std::vector<UPtrDecl> params,
                      std::vector<UPtrDecl> localDecls,

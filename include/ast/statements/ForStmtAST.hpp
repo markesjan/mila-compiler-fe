@@ -11,8 +11,7 @@ namespace milan {
 
 class ForStmtAST : public StmtAST {
 public:
-    ForStmtAST(int row,
-               int col,
+    ForStmtAST(SourceLocation loc,
                std::string name,
                UPtrExpr start,
                UPtrExpr stop,

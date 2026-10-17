@@ -8,7 +8,7 @@ namespace milan {
 
 class VariableExprAST : public ExprAST {
 public:
-    VariableExprAST(int row, int col, std::string name);
+    VariableExprAST(SourceLocation loc, std::string name);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

@@ -7,7 +7,7 @@
 
 namespace milan {
 
-ExitStmtAST::ExitStmtAST(int row, int col) : StmtAST(row, col) {}
+ExitStmtAST::ExitStmtAST(SourceLocation loc) : StmtAST(loc) {}
 
 llvm::Value* ExitStmtAST::codegen(CodegenContext& ctx) {
     llvm::Function* callerFunc = ctx.builder.GetInsertBlock()->getParent();

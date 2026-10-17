@@ -2,8 +2,8 @@
 
 namespace milan {
 
-BinaryOpExprAST::BinaryOpExprAST(int row, int col, TokenKind op, UPtrExpr lhs, UPtrExpr rhs)
-    : ExprAST(row, col), op(op), lhs(std::move(lhs)), rhs(std::move(rhs)) {}
+BinaryOpExprAST::BinaryOpExprAST(SourceLocation loc, TokenKind op, UPtrExpr lhs, UPtrExpr rhs)
+    : ExprAST(loc), op(op), lhs(std::move(lhs)), rhs(std::move(rhs)) {}
 
 llvm::Value* BinaryOpExprAST::codegen(CodegenContext& ctx) {
     llvm::Value* lVal = lhs->codegen(ctx);

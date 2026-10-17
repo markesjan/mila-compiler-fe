@@ -9,7 +9,7 @@ namespace milan {
 
 class ArrayAccessExprAST : public ExprAST {
 public:
-    ArrayAccessExprAST(int row, int col, std::string name, UPtrExpr idx);
+    ArrayAccessExprAST(SourceLocation loc, std::string name, UPtrExpr idx);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

@@ -6,7 +6,7 @@ namespace milan {
 
 class BooleanExprAST : public ExprAST {
 public:
-    BooleanExprAST(int row, int col, bool val);
+    BooleanExprAST(SourceLocation loc, bool val);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

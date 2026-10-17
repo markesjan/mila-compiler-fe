@@ -10,7 +10,7 @@ namespace milan {
 
 class AssignStmtAST : public StmtAST {
 public:
-    AssignStmtAST(int row, int col, std::string name, UPtrExpr val, UPtrExpr idx);
+    AssignStmtAST(SourceLocation loc, std::string name, UPtrExpr val, UPtrExpr idx);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:

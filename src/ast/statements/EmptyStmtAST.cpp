@@ -4,7 +4,7 @@
 
 namespace milan {
 
-EmptyStmtAST::EmptyStmtAST(int row, int col) : StmtAST(row, col) {}
+EmptyStmtAST::EmptyStmtAST(SourceLocation loc) : StmtAST(loc) {}
 
 llvm::Value* EmptyStmtAST::codegen(CodegenContext& ctx) {
     return llvm::ConstantInt::getTrue(ctx.context);

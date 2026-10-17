@@ -5,8 +5,8 @@
 
 namespace milan {
 
-ArrayAccessExprAST::ArrayAccessExprAST(int row, int col, std::string name, UPtrExpr idx)
-    : ExprAST(row, col), name(std::move(name)), idx(std::move(idx)) {}
+ArrayAccessExprAST::ArrayAccessExprAST(SourceLocation loc, std::string name, UPtrExpr idx)
+    : ExprAST(loc), name(std::move(name)), idx(std::move(idx)) {}
 
 llvm::Value* ArrayAccessExprAST::codegen(CodegenContext& ctx) {
     llvm::Value* arrayVal = ctx.symbolTable[name];

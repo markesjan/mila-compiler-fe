@@ -10,8 +10,8 @@
 
 namespace milan {
 
-IfStmtAST::IfStmtAST(int row, int col, UPtrExpr cond, UPtrStmt thenStmt, UPtrStmt elseStmt)
-    : StmtAST(row, col),
+IfStmtAST::IfStmtAST(SourceLocation loc, UPtrExpr cond, UPtrStmt thenStmt, UPtrStmt elseStmt)
+    : StmtAST(loc),
       cond(std::move(cond)),
       thenStmt(std::move(thenStmt)),
       elseStmt(std::move(elseStmt)) {}

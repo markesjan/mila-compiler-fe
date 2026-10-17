@@ -7,7 +7,7 @@ namespace milan {
 
 class WhileStmtAST : public StmtAST {
 public:
-    WhileStmtAST(int row, int col, UPtrExpr cond, UPtrStmt loopStmt);
+    WhileStmtAST(SourceLocation loc, UPtrExpr cond, UPtrStmt loopStmt);
     llvm::Value* codegen(CodegenContext& ctx) override;
 
 private:
