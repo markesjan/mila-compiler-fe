@@ -13,11 +13,11 @@ llvm::Value* ReadlnStmtAST::codegen(CodegenContext& ctx) {
     if (!calleeF)
         return nullptr;
 
-    llvm::Value* dest = ctx.symbolTable[varName];
-    if (!dest)
+    const auto* dest = ctx.symbols.lookup(varName);
+    if (!dest || !dest->value)
         return nullptr;
 
-    ctx.builder.CreateCall(calleeF, dest);
+    ctx.builder.CreateCall(calleeF, dest->value);
 
     return llvm::ConstantInt::getTrue(ctx.context);
 }

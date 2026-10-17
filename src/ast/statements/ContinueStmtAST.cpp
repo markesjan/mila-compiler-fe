@@ -8,10 +8,10 @@ namespace milan {
 ContinueStmtAST::ContinueStmtAST(SourceLocation loc) : StmtAST(loc) {}
 
 llvm::Value* ContinueStmtAST::codegen(CodegenContext& ctx) {
-    if (ctx.loopContinueBlocks.empty())
+    if (ctx.loops.empty())
         return nullptr;
 
-    llvm::BasicBlock* continueTarget = ctx.loopContinueBlocks.back();
+    llvm::BasicBlock* continueTarget = ctx.loops.getContinueTarget();
     ctx.builder.CreateBr(continueTarget);
 
     llvm::Function* callerFunc = ctx.builder.GetInsertBlock()->getParent();

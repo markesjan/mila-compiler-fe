@@ -9,11 +9,11 @@ ArrayAccessExprAST::ArrayAccessExprAST(SourceLocation loc, std::string name, UPt
     : ExprAST(loc), name(std::move(name)), idx(std::move(idx)) {}
 
 llvm::Value* ArrayAccessExprAST::codegen(CodegenContext& ctx) {
-    llvm::Value* arrayVal = ctx.symbolTable[name];
-    if (!arrayVal)
+    const auto* arraySym = ctx.symbols.lookup(name);
+    if (!arraySym || !arraySym->value)
         return nullptr;
 
-    auto* alloca = llvm::dyn_cast<llvm::AllocaInst>(arrayVal);
+    auto* alloca = llvm::dyn_cast<llvm::AllocaInst>(arraySym->value);
     if (!alloca)
         return nullptr;
 
@@ -21,9 +21,8 @@ llvm::Value* ArrayAccessExprAST::codegen(CodegenContext& ctx) {
     if (!indexVal)
         return nullptr;
 
-    auto it = ctx.typeTable.find(name);
-    if (it != ctx.typeTable.end() && it->second.isArrayType()) {
-        int low = it->second.getLow();
+    if (arraySym->type.isArrayType()) {
+        int low = arraySym->type.getLow();
         if (low != 0) {
             llvm::Value* lowVal = llvm::ConstantInt::get(llvm::Type::getInt32Ty(ctx.context), low);
             indexVal = ctx.builder.CreateSub(indexVal, lowVal, "subidx");

@@ -8,10 +8,10 @@ namespace milan {
 BreakStmtAST::BreakStmtAST(SourceLocation loc) : StmtAST(loc) {}
 
 llvm::Value* BreakStmtAST::codegen(CodegenContext& ctx) {
-    if (ctx.loopBreakBlocks.empty())
+    if (ctx.loops.empty())
         return nullptr;
 
-    llvm::BasicBlock* breakTarget = ctx.loopBreakBlocks.back();
+    llvm::BasicBlock* breakTarget = ctx.loops.getBreakTarget();
     ctx.builder.CreateBr(breakTarget);
 
     llvm::Function* callerFunc = ctx.builder.GetInsertBlock()->getParent();

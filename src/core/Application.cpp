@@ -43,7 +43,7 @@ int Application::run(std::istream& input) {
 
     setupBuiltins();
 
-    CodegenContext ctx{context, module, builder, {}, {}, {}, {}};
+    CodegenContext ctx{context, module, builder, {}, {}};
     program->codegen(ctx);
 
     module.print(llvm::outs(), nullptr);

@@ -5,6 +5,8 @@
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Type.h>
 
+#include "LoopGuard.hpp"
+
 namespace milan {
 
 ForStmtAST::ForStmtAST(SourceLocation loc,
@@ -21,14 +23,18 @@ ForStmtAST::ForStmtAST(SourceLocation loc,
       loopStmt(std::move(loopStmt)) {}
 
 llvm::Value* ForStmtAST::codegen(CodegenContext& ctx) {
-    llvm::Value* varAllocaRaw = ctx.symbolTable[name];
-    llvm::AllocaInst* varAlloca = llvm::dyn_cast_or_null<llvm::AllocaInst>(varAllocaRaw);
+    const auto* varAllocaRaw = ctx.symbols.lookup(name);
+    if (!varAllocaRaw || !varAllocaRaw->value)
+        return nullptr;
+
+    auto* varAlloca = llvm::dyn_cast_or_null<llvm::AllocaInst>(varAllocaRaw->value);
     if (!varAlloca)
         return nullptr;
 
     llvm::Value* startVal = start->codegen(ctx);
     if (!startVal)
         return nullptr;
+
     ctx.builder.CreateStore(startVal, varAlloca);
 
     llvm::Value* stopVal = stop->codegen(ctx);
@@ -58,17 +64,9 @@ llvm::Value* ForStmtAST::codegen(CodegenContext& ctx) {
     callerFunc->insert(callerFunc->end(), loopBlock);
     ctx.builder.SetInsertPoint(loopBlock);
 
-    ctx.loopBreakBlocks.push_back(afterBlock);
-    ctx.loopContinueBlocks.push_back(stepBlock);
-
-    if (!loopStmt->codegen(ctx)) {
-        ctx.loopBreakBlocks.pop_back();
-        ctx.loopContinueBlocks.pop_back();
+    LoopGuard loopGuard(ctx.loops, afterBlock, stepBlock);
+    if (!loopStmt->codegen(ctx))
         return nullptr;
-    }
-
-    ctx.loopBreakBlocks.pop_back();
-    ctx.loopContinueBlocks.pop_back();
 
     ctx.builder.CreateBr(stepBlock);
 

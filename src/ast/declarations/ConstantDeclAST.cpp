@@ -10,7 +10,8 @@ llvm::Value* ConstantDeclAST::codegen(CodegenContext& ctx) {
     if (!constVal)
         return nullptr;
 
-    ctx.symbolTable[name] = constVal;
+    BaseType baseType = constVal->getType()->isIntegerTy(1) ? BaseType::Bool : BaseType::Int;
+    ctx.symbols.insert(name, Type(baseType), constVal, true);
 
     return llvm::ConstantInt::getTrue(ctx.context);
 }

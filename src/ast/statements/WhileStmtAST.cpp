@@ -3,6 +3,8 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/Function.h>
 
+#include "LoopGuard.hpp"
+
 namespace milan {
 
 WhileStmtAST::WhileStmtAST(SourceLocation loc, UPtrExpr cond, UPtrStmt loopStmt)
@@ -25,17 +27,9 @@ llvm::Value* WhileStmtAST::codegen(CodegenContext& ctx) {
     callerFunc->insert(callerFunc->end(), loopBlock);
     ctx.builder.SetInsertPoint(loopBlock);
 
-    ctx.loopBreakBlocks.push_back(afterBlock);
-    ctx.loopContinueBlocks.push_back(condBlock);
-
-    if (!loopStmt->codegen(ctx)) {
-        ctx.loopBreakBlocks.pop_back();
-        ctx.loopContinueBlocks.pop_back();
+    LoopGuard loopGuard(ctx.loops, afterBlock, condBlock);
+    if (!loopStmt->codegen(ctx))
         return nullptr;
-    }
-
-    ctx.loopBreakBlocks.pop_back();
-    ctx.loopContinueBlocks.pop_back();
 
     ctx.builder.CreateBr(condBlock);
     callerFunc->insert(callerFunc->end(), afterBlock);

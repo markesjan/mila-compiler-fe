@@ -8,15 +8,15 @@ VariableExprAST::VariableExprAST(SourceLocation loc, std::string name)
     : ExprAST(loc), name(std::move(name)) {}
 
 llvm::Value* VariableExprAST::codegen(CodegenContext& ctx) {
-    llvm::Value* v = ctx.symbolTable[name];
-    if (!v)
+    const auto* var = ctx.symbols.lookup(name);
+    if (!var || !var->value)
         return nullptr;
 
-    auto* alloca = llvm::dyn_cast<llvm::AllocaInst>(v);
+    auto* alloca = llvm::dyn_cast<llvm::AllocaInst>(var->value);
     if (alloca)
         return ctx.builder.CreateLoad(alloca->getAllocatedType(), alloca, name.c_str());
 
-    return v;
+    return var->value;
 }
 
 } // namespace milan

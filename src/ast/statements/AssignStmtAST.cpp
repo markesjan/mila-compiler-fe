@@ -10,9 +10,11 @@ llvm::Value* AssignStmtAST::codegen(CodegenContext& ctx) {
     if (!assignedVal)
         return nullptr;
 
-    llvm::Value* dest = ctx.symbolTable[name];
-    llvm::AllocaInst* allocaDest = llvm::dyn_cast_or_null<llvm::AllocaInst>(dest);
+    const auto* dest = ctx.symbols.lookup(name);
+    if (!dest || !dest->value)
+        return nullptr;
 
+    auto* allocaDest = llvm::dyn_cast_or_null<llvm::AllocaInst>(dest->value);
     if (!allocaDest)
         return nullptr;
 
@@ -23,9 +25,8 @@ llvm::Value* AssignStmtAST::codegen(CodegenContext& ctx) {
         if (!indexVal)
             return nullptr;
 
-        auto it = ctx.typeTable.find(name);
-        if (it != ctx.typeTable.end() && it->second.isArrayType()) {
-            int low = it->second.getLow();
+        if (dest->type.isArrayType()) {
+            int low = dest->type.getLow();
             if (low != 0) {
                 llvm::Value* lowVal =
                     llvm::ConstantInt::get(llvm::Type::getInt32Ty(ctx.context), low);
