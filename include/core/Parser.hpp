@@ -1,8 +1,11 @@
 #pragma once
 
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Module.h>
+#include <iostream>
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <vector>
 
 #include "Diagnostic.hpp"
 #include "ExprAST.hpp"
@@ -15,27 +18,21 @@ namespace milan {
 
 class Parser {
 public:
-    Parser();
+    explicit Parser(std::istream& input = std::cin);
     ~Parser() = default;
 
-    bool parse();
-    const llvm::Module& generate();
+    std::unique_ptr<Program> parse();
 
 private:
     Lexer lexer;
     Token currTok;
-    std::unique_ptr<Program> programAST;
-
-    llvm::LLVMContext MilaContext;
-    llvm::IRBuilder<> MilaBuilder;
-    llvm::Module MilaModule;
 
     Token getNextToken();
     bool match(TokenKind expected);
     bool expect(TokenKind expected, std::string_view ctx = "");
     std::string formatCurrentToken() const;
 
-    bool parseProgram();
+    std::unique_ptr<Program> parseProgram();
     std::optional<Type> parseType();
 
     std::vector<UPtrDecl> parseConstSection();
