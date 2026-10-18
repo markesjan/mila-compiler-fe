@@ -5,6 +5,7 @@
 #include "BooleanExprAST.hpp"
 #include "CallExprAST.hpp"
 #include "NumberExprAST.hpp"
+#include "RealExprAST.hpp"
 #include "UnaryOpExprAST.hpp"
 #include "VariableExprAST.hpp"
 

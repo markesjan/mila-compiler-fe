@@ -1,5 +1,8 @@
 #include "AssignStmtAST.hpp"
 
+#include "ArrayType.hpp"
+#include "RealType.hpp"
+
 namespace milan {
 
 AssignStmtAST::AssignStmtAST(SourceLocation loc, std::string name, UPtrExpr val, UPtrExpr idx)
@@ -39,6 +42,14 @@ llvm::Value* AssignStmtAST::codegen(CodegenContext& ctx) {
 
         targetPtr =
             ctx.builder.CreateGEP(allocaDest->getAllocatedType(), allocaDest, indices, "arrayidx");
+    }
+
+    Type targetType =
+        (idx && dest->type.isArrayType()) ? dest->type.as<ArrayType>()->getElemType() : dest->type;
+
+    if (targetType.is<RealType>() && assignedVal->getType()->isIntegerTy()) {
+        assignedVal =
+            ctx.builder.CreateSIToFP(assignedVal, llvm::Type::getDoubleTy(ctx.context), "conv");
     }
 
     ctx.builder.CreateStore(assignedVal, targetPtr);

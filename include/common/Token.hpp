@@ -13,6 +13,7 @@ struct Token {
     SourceLocation location{};
     std::string text;
     std::int32_t numberValue = 0;
+    double realValue = 0.0;
 
     std::string_view name() const noexcept;
 

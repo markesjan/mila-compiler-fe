@@ -14,3 +14,18 @@ int readln(int* x) {
     scanf("%d", x);
     return 0;
 }
+
+int writelnReal(double x) {
+    printf("%lf\n", x);
+    return 0;
+}
+
+int writeReal(double x) {
+    printf("%lf", x);
+    return 0;
+}
+
+int readlnReal(double* x) {
+    scanf("%lf", x);
+    return 0;
+}

@@ -28,6 +28,7 @@ public:
         return Type(std::make_shared<T>(std::forward<Args>(args)...));
     }
 
+    static Type fromLlvmType(const llvm::Type* llvmType);
     llvm::Type* toLlvmType(llvm::LLVMContext& ctx) const;
     std::string toString() const;
 

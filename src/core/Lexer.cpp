@@ -43,7 +43,8 @@ const std::unordered_map<std::string_view, TokenKind> keywords = {
     {"array", TokenKind::Array},
     {"of", TokenKind::Of},
     {"true", TokenKind::True},
-    {"false", TokenKind::False}};
+    {"false", TokenKind::False},
+};
 
 }
 
@@ -135,9 +136,49 @@ Token Lexer::tokenizeNumber(SourceLocation loc) {
         lastChar = readNextChar();
     }
 
+    bool isReal = false;
+    if (base == 10 && lastChar == '.' && input.peek() != '.' && std::isdigit(input.peek())) {
+        isReal = true;
+        numStr += '.';
+        lastChar = readNextChar();
+
+        while (std::isdigit(lastChar)) {
+            numStr += static_cast<char>(lastChar);
+            lastChar = readNextChar();
+        }
+    }
+
+    if (base == 10 && (lastChar == 'e' || lastChar == 'E')) {
+        int nextCh = input.peek();
+        if (std::isdigit(nextCh) || nextCh == '+' || nextCh == '-') {
+            isReal = true;
+            numStr += static_cast<char>(lastChar);
+            lastChar = readNextChar();
+            if (lastChar == '+' || lastChar == '-') {
+                numStr += static_cast<char>(lastChar);
+                lastChar = readNextChar();
+            }
+            while (std::isdigit(lastChar)) {
+                numStr += static_cast<char>(lastChar);
+                lastChar = readNextChar();
+            }
+        }
+    }
+
     if (numStr.empty()) {
         Diagnostic::error(loc, "Empty numeric literal");
         return Token{TokenKind::Error, loc, numStr, 0};
+    }
+
+    if (isReal) {
+        try {
+            double realVal = std::stod(numStr);
+            Token tok{TokenKind::RealNumber, loc, numStr, 0, realVal};
+            return tok;
+        } catch (...) {
+            Diagnostic::error(loc, "Real number out of range");
+            return Token{TokenKind::Error, loc, numStr, 0};
+        }
     }
 
     try {
@@ -165,6 +206,8 @@ Token Lexer::tokenizeOperator(SourceLocation loc) {
             return makeToken(TokenKind::Minus, "-");
         case '*':
             return makeToken(TokenKind::Mul, "*");
+        case '/':
+            return makeToken(TokenKind::Slash, "/");
         case '=':
             return makeToken(TokenKind::Equal, "=");
         case '(':

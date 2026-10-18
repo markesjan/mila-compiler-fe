@@ -13,12 +13,15 @@ namespace milan {
 std::optional<Type> Parser::parseType() {
     if (currTok.is(TokenKind::Integer)) {
         getNextToken();
-        return Type(BaseType::Int);
+        return Type::getInt();
     }
-
     if (currTok.is(TokenKind::Boolean)) {
         getNextToken();
-        return Type(BaseType::Bool);
+        return Type::getBool();
+    }
+    if (currTok.is(TokenKind::Real)) {
+        getNextToken();
+        return Type::getReal();
     }
 
     if (currTok.is(TokenKind::Array)) {
@@ -63,19 +66,22 @@ std::optional<Type> Parser::parseType() {
         if (!expect(TokenKind::Of, "array declaration"))
             return std::nullopt;
 
-        BaseType elemType = BaseType::Int;
+        std::optional<Type> elemType;
         if (currTok.is(TokenKind::Integer)) {
-            elemType = BaseType::Int;
+            elemType = Type::getInt();
             getNextToken();
         } else if (currTok.is(TokenKind::Boolean)) {
-            elemType = BaseType::Bool;
+            elemType = Type::getBool();
+            getNextToken();
+        } else if (currTok.is(TokenKind::Real)) {
+            elemType = Type::getReal();
             getNextToken();
         } else {
             Diagnostic::error(currTok.location, "Unknown array element type");
             return std::nullopt;
         }
 
-        return Type::createArray(*low, *high, elemType);
+        return Type::createArray(*low, *high, *elemType);
     }
 
     Diagnostic::error(currTok.location, "Expected type in variable declaration");

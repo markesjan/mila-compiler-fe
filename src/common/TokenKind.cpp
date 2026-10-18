@@ -12,6 +12,8 @@ std::string_view tokenKindToString(TokenKind kind) {
             return "identifier";
         case TokenKind::Number:
             return "number";
+        case TokenKind::RealNumber:
+            return "real number";
         case TokenKind::True:
             return "true";
         case TokenKind::False:
@@ -70,6 +72,8 @@ std::string_view tokenKindToString(TokenKind kind) {
             return "-";
         case TokenKind::Mul:
             return "*";
+        case TokenKind::Slash:
+            return "/";
         case TokenKind::Div:
             return "div";
         case TokenKind::Mod:

@@ -34,6 +34,20 @@ Type Type::createArray(std::int32_t low, std::int32_t high, Type elemType) {
     return make<ArrayType>(low, high, std::move(elemType));
 }
 
+Type Type::fromLlvmType(const llvm::Type* llvmType) {
+    if (!llvmType)
+        return {};
+    if (llvmType->isIntegerTy(32))
+        return getInt();
+    if (llvmType->isIntegerTy(1))
+        return getBool();
+    if (llvmType->isDoubleTy())
+        return getReal();
+    if (llvmType->isVoidTy())
+        return getVoid();
+    return {};
+}
+
 llvm::Type* Type::toLlvmType(llvm::LLVMContext& ctx) const {
     return impl ? impl->toLlvmType(ctx) : nullptr;
 }

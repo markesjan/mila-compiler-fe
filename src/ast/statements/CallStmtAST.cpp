@@ -10,20 +10,26 @@ CallStmtAST::CallStmtAST(SourceLocation loc, std::string name, std::vector<UPtrE
     : StmtAST(loc), name(std::move(name)), args(std::move(args)) {}
 
 llvm::Value* CallStmtAST::codegen(CodegenContext& ctx) {
-    llvm::Function* calleeF = ctx.module.getFunction(name);
+    std::vector<llvm::Value*> argsV;
+    for (const auto& arg : args) {
+        llvm::Value* argVal = arg->codegen(ctx);
+        if (!argVal)
+            return nullptr;
+        argsV.push_back(argVal);
+    }
+
+    std::string fnName = name;
+    if ((name == "writeln" || name == "write") && argsV.size() == 1 &&
+        argsV[0]->getType()->isDoubleTy()) {
+        fnName += "Real";
+    }
+
+    llvm::Function* calleeF = ctx.module.getFunction(fnName);
     if (!calleeF)
         return nullptr;
 
     if (calleeF->arg_size() != args.size())
         return nullptr;
-
-    std::vector<llvm::Value*> argsV;
-    for (unsigned i = 0, e = args.size(); i != e; ++i) {
-        llvm::Value* argVal = args[i]->codegen(ctx);
-        if (!argVal)
-            return nullptr;
-        argsV.push_back(argVal);
-    }
 
     ctx.builder.CreateCall(calleeF, argsV);
 

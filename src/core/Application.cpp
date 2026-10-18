@@ -74,6 +74,30 @@ void Application::setupBuiltins() {
         for (auto& arg : fn->args())
             arg.setName("x");
     }
+
+    // Create readlnReal function
+    {
+        std::vector<llvm::Type*> ptrs(1, llvm::PointerType::getUnqual(context));
+        llvm::FunctionType* fnType =
+            llvm::FunctionType::get(llvm::Type::getInt32Ty(context), ptrs, false);
+        llvm::Function* fn =
+            llvm::Function::Create(fnType, llvm::Function::ExternalLinkage, "readlnReal", module);
+
+        for (auto& arg : fn->args())
+            arg.setName("x");
+    }
+
+    // Create writelnReal function
+    {
+        std::vector<llvm::Type*> doubles(1, llvm::Type::getDoubleTy(context));
+        llvm::FunctionType* fnType =
+            llvm::FunctionType::get(llvm::Type::getInt32Ty(context), doubles, false);
+        llvm::Function* fn =
+            llvm::Function::Create(fnType, llvm::Function::ExternalLinkage, "writelnReal", module);
+
+        for (auto& arg : fn->args())
+            arg.setName("x");
+    }
 }
 
 } // namespace milan

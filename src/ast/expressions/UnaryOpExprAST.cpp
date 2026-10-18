@@ -12,6 +12,8 @@ llvm::Value* UnaryOpExprAST::codegen(CodegenContext& ctx) {
 
     switch (op) {
         case TokenKind::Minus:
+            if (operandVal->getType()->isDoubleTy())
+                return ctx.builder.CreateFNeg(operandVal, "fnegtmp");
             return ctx.builder.CreateNeg(operandVal, "negtmp");
         case TokenKind::Not:
             return ctx.builder.CreateNot(operandVal, "nottmp");

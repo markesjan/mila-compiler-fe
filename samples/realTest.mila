@@ -1,0 +1,32 @@
+program realTest;
+const
+    PI = 3.14159;
+var
+    r : real;
+    d : real;
+    arr : array [1..3] of real;
+begin
+    r := 2.5;
+    d := r * 2.0;
+    writeln(d);
+
+    writeln(5 / 2);
+
+    writeln(-r);
+
+    writeln(PI);
+
+    arr[1] := 10;
+    arr[2] := arr[1] / 4;
+    writeln(arr[2]);
+
+    if arr[2] > 2.0 then
+        writeln(1)
+    else
+        writeln(0);
+
+    if r = 2.5 then
+        writeln(1)
+    else
+        writeln(0);
+end.

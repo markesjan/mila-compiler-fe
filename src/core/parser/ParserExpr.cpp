@@ -81,7 +81,8 @@ UPtrExpr Parser::parseTerm() {
 
     while (true) {
         if (currTok.is(TokenKind::Mul) || currTok.is(TokenKind::Div) ||
-            currTok.is(TokenKind::Mod) || currTok.is(TokenKind::And)) {
+            currTok.is(TokenKind::Slash) || currTok.is(TokenKind::Mod) ||
+            currTok.is(TokenKind::And)) {
             TokenKind op = currTok.kind;
             getNextToken();
 
@@ -108,6 +109,12 @@ UPtrExpr Parser::parseFactor() {
         auto numExpr = std::make_unique<NumberExprAST>(loc, currTok.numberValue);
         getNextToken();
         return numExpr;
+    }
+
+    if (currTok.is(TokenKind::RealNumber)) {
+        auto realExpr = std::make_unique<RealExprAST>(loc, currTok.realValue);
+        getNextToken();
+        return realExpr;
     }
 
     if (currTok.is(TokenKind::True) || currTok.is(TokenKind::False)) {

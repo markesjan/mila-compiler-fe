@@ -6,25 +6,10 @@
 namespace milan {
 
 VariableDeclAST::VariableDeclAST(SourceLocation loc, std::vector<std::string> names, Type type)
-    : DeclAST(loc), names(std::move(names)), type(type) {}
+    : DeclAST(loc), names(std::move(names)), type(std::move(type)) {}
 
 llvm::Value* VariableDeclAST::codegen(CodegenContext& ctx) {
-    llvm::Type* varType = nullptr;
-
-    switch (type.getBase()) {
-        case BaseType::Int:
-            varType = llvm::Type::getInt32Ty(ctx.context);
-            break;
-        case BaseType::Bool:
-            varType = llvm::Type::getInt1Ty(ctx.context);
-            break;
-        default:
-            break;
-    }
-
-    if (type.isArrayType())
-        varType = llvm::ArrayType::get(varType, type.getHigh() - type.getLow() + 1);
-
+    llvm::Type* varType = type.toLlvmType(ctx.context);
     if (!varType)
         return nullptr;
 
