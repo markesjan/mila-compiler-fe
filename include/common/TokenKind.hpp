@@ -11,6 +11,7 @@ enum class TokenKind : std::uint8_t {
     Identifier,
     Number,
     RealNumber,
+    StringLiteral,
     True,
     False,
     Program,

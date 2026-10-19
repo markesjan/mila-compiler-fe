@@ -67,6 +67,21 @@ Token Lexer::nextToken() {
         return tokenizeKeywordOrIdentifier(tokLoc);
     if (std::isdigit(lastChar) || lastChar == '$' || lastChar == '&')
         return tokenizeNumber(tokLoc);
+    if (lastChar == '\'') {
+        std::string str;
+        lastChar = readNextChar();
+        while (lastChar != '\'' && lastChar != EOF) {
+            str += static_cast<char>(lastChar);
+            lastChar = readNextChar();
+        }
+
+        if (lastChar == '\'')
+            lastChar = readNextChar();
+        else
+            Diagnostic::error(tokLoc, "Unterminated string literal");
+
+        return Token{TokenKind::StringLiteral, tokLoc, str, 0};
+    }
     if (lastChar == EOF)
         return Token{TokenKind::Eof, tokLoc, "", 0};
 

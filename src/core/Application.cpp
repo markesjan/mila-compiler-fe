@@ -63,18 +63,6 @@ void Application::setupBuiltins() {
             arg.setName("x");
     }
 
-    // Create writeln function
-    {
-        std::vector<llvm::Type*> ints(1, llvm::Type::getInt32Ty(context));
-        llvm::FunctionType* fnType =
-            llvm::FunctionType::get(llvm::Type::getInt32Ty(context), ints, false);
-        llvm::Function* fn =
-            llvm::Function::Create(fnType, llvm::Function::ExternalLinkage, "writeln", module);
-
-        for (auto& arg : fn->args())
-            arg.setName("x");
-    }
-
     // Create readlnReal function
     {
         std::vector<llvm::Type*> ptrs(1, llvm::PointerType::getUnqual(context));
@@ -87,6 +75,42 @@ void Application::setupBuiltins() {
             arg.setName("x");
     }
 
+    // Create write function
+    {
+        std::vector<llvm::Type*> ints(1, llvm::Type::getInt32Ty(context));
+        llvm::FunctionType* fnType =
+            llvm::FunctionType::get(llvm::Type::getInt32Ty(context), ints, false);
+        llvm::Function* fn =
+            llvm::Function::Create(fnType, llvm::Function::ExternalLinkage, "write", module);
+
+        for (auto& arg : fn->args())
+            arg.setName("x");
+    }
+
+    // Create writeln function
+    {
+        std::vector<llvm::Type*> ints(1, llvm::Type::getInt32Ty(context));
+        llvm::FunctionType* fnType =
+            llvm::FunctionType::get(llvm::Type::getInt32Ty(context), ints, false);
+        llvm::Function* fn =
+            llvm::Function::Create(fnType, llvm::Function::ExternalLinkage, "writeln", module);
+
+        for (auto& arg : fn->args())
+            arg.setName("x");
+    }
+
+    // Create writeReal function
+    {
+        std::vector<llvm::Type*> doubles(1, llvm::Type::getDoubleTy(context));
+        llvm::FunctionType* fnType =
+            llvm::FunctionType::get(llvm::Type::getInt32Ty(context), doubles, false);
+        llvm::Function* fn =
+            llvm::Function::Create(fnType, llvm::Function::ExternalLinkage, "writeReal", module);
+
+        for (auto& arg : fn->args())
+            arg.setName("x");
+    }
+
     // Create writelnReal function
     {
         std::vector<llvm::Type*> doubles(1, llvm::Type::getDoubleTy(context));
@@ -94,6 +118,30 @@ void Application::setupBuiltins() {
             llvm::FunctionType::get(llvm::Type::getInt32Ty(context), doubles, false);
         llvm::Function* fn =
             llvm::Function::Create(fnType, llvm::Function::ExternalLinkage, "writelnReal", module);
+
+        for (auto& arg : fn->args())
+            arg.setName("x");
+    }
+
+    // Create writeString function
+    {
+        std::vector<llvm::Type*> ptrs(1, llvm::PointerType::getUnqual(context));
+        llvm::FunctionType* fnType =
+            llvm::FunctionType::get(llvm::Type::getInt32Ty(context), ptrs, false);
+        llvm::Function* fn =
+            llvm::Function::Create(fnType, llvm::Function::ExternalLinkage, "writeString", module);
+
+        for (auto& arg : fn->args())
+            arg.setName("x");
+    }
+
+    // Create writelnString function
+    {
+        std::vector<llvm::Type*> ptrs(1, llvm::PointerType::getUnqual(context));
+        llvm::FunctionType* fnType =
+            llvm::FunctionType::get(llvm::Type::getInt32Ty(context), ptrs, false);
+        llvm::Function* fn = llvm::Function::Create(fnType, llvm::Function::ExternalLinkage,
+                                                    "writelnString", module);
 
         for (auto& arg : fn->args())
             arg.setName("x");

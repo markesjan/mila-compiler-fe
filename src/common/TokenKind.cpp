@@ -14,6 +14,8 @@ std::string_view tokenKindToString(TokenKind kind) {
             return "number";
         case TokenKind::RealNumber:
             return "real number";
+        case TokenKind::StringLiteral:
+            return "string literal";
         case TokenKind::True:
             return "true";
         case TokenKind::False:

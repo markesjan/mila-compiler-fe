@@ -29,3 +29,13 @@ int readlnReal(double* x) {
     scanf("%lf", x);
     return 0;
 }
+
+int writelnString(const char* x) {
+    printf("%s\n", x);
+    return 0;
+}
+
+int writeString(const char* x) {
+    printf("%s", x);
+    return 0;
+}

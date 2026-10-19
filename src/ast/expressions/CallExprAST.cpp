@@ -17,9 +17,11 @@ llvm::Value* CallExprAST::codegen(CodegenContext& ctx) {
     }
 
     std::string fnName = name;
-    if ((name == "writeln" || name == "write") && argsV.size() == 1 &&
-        argsV[0]->getType()->isDoubleTy()) {
-        fnName += "Real";
+    if ((name == "writeln" || name == "write") && argsV.size() == 1) {
+        if (argsV[0]->getType()->isDoubleTy())
+            fnName += "Real";
+        else if (argsV[0]->getType()->isPointerTy())
+            fnName += "String";
     }
 
     llvm::Function* calleeF = ctx.module.getFunction(fnName);

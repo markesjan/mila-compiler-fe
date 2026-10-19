@@ -117,6 +117,12 @@ UPtrExpr Parser::parseFactor() {
         return realExpr;
     }
 
+    if (currTok.is(TokenKind::StringLiteral)) {
+        auto strExpr = std::make_unique<StringExprAST>(loc, currTok.text);
+        getNextToken();
+        return strExpr;
+    }
+
     if (currTok.is(TokenKind::True) || currTok.is(TokenKind::False)) {
         bool val = currTok.is(TokenKind::True);
         getNextToken();

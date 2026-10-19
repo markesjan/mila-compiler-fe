@@ -6,6 +6,7 @@
 #include "CallExprAST.hpp"
 #include "NumberExprAST.hpp"
 #include "RealExprAST.hpp"
+#include "StringExprAST.hpp"
 #include "UnaryOpExprAST.hpp"
 #include "VariableExprAST.hpp"
 
