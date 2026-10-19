@@ -17,6 +17,9 @@ llvm::Value* ArrayAccessExprAST::codegen(CodegenContext& ctx) {
     if (!alloca)
         return nullptr;
 
+    if (!idx)
+        return nullptr;
+
     llvm::Value* indexVal = idx->codegen(ctx);
     if (!indexVal)
         return nullptr;

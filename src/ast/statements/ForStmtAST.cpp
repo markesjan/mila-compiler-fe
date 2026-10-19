@@ -31,6 +31,9 @@ llvm::Value* ForStmtAST::codegen(CodegenContext& ctx) {
     if (!varAlloca)
         return nullptr;
 
+    if (!start || !stop)
+        return nullptr;
+
     llvm::Value* startVal = start->codegen(ctx);
     if (!startVal)
         return nullptr;
@@ -65,7 +68,7 @@ llvm::Value* ForStmtAST::codegen(CodegenContext& ctx) {
     ctx.builder.SetInsertPoint(loopBlock);
 
     LoopGuard loopGuard(ctx.loops, afterBlock, stepBlock);
-    if (!loopStmt->codegen(ctx))
+    if (loopStmt && !loopStmt->codegen(ctx))
         return nullptr;
 
     ctx.builder.CreateBr(stepBlock);

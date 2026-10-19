@@ -14,13 +14,16 @@ void Program::codegen(CodegenContext& ctx) {
     llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(ctx.context, "entry", mainFunc);
     ctx.builder.SetInsertPoint(entryBlock);
 
-    for (const auto& d : globalDecls)
-        d->codegen(ctx);
+    for (const auto& d : globalDecls) {
+        if (d)
+            d->codegen(ctx);
+    }
 
     if (mainBlock)
         mainBlock->codegen(ctx);
 
-    ctx.builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(ctx.context), 0));
+    if (!ctx.builder.GetInsertBlock()->getTerminator())
+        ctx.builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(ctx.context), 0));
 }
 
 } // namespace milan

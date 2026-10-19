@@ -7,6 +7,8 @@ CompoundStmtAST::CompoundStmtAST(SourceLocation loc, std::vector<UPtrStmt> stmts
 
 llvm::Value* CompoundStmtAST::codegen(CodegenContext& ctx) {
     for (auto& stmt : stmts) {
+        if (!stmt)
+            continue;
         llvm::Value* val = stmt->codegen(ctx);
         if (!val)
             return nullptr;

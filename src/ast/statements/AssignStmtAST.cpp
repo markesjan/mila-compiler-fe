@@ -9,6 +9,9 @@ AssignStmtAST::AssignStmtAST(SourceLocation loc, std::string name, UPtrExpr val,
     : StmtAST(loc), name(std::move(name)), val(std::move(val)), idx(std::move(idx)) {}
 
 llvm::Value* AssignStmtAST::codegen(CodegenContext& ctx) {
+    if (!val)
+        return nullptr;
+
     llvm::Value* assignedVal = val->codegen(ctx);
     if (!assignedVal)
         return nullptr;

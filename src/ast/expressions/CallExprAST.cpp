@@ -11,6 +11,8 @@ CallExprAST::CallExprAST(SourceLocation loc, std::string name, std::vector<UPtrE
 llvm::Value* CallExprAST::codegen(CodegenContext& ctx) {
     std::vector<llvm::Value*> argsV;
     for (const auto& arg : args) {
+        if (!arg)
+            return nullptr;
         argsV.push_back(arg->codegen(ctx));
         if (!argsV.back())
             return nullptr;

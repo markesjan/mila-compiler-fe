@@ -6,6 +6,9 @@ BinaryOpExprAST::BinaryOpExprAST(SourceLocation loc, TokenKind op, UPtrExpr lhs,
     : ExprAST(loc), op(op), lhs(std::move(lhs)), rhs(std::move(rhs)) {}
 
 llvm::Value* BinaryOpExprAST::codegen(CodegenContext& ctx) {
+    if (!lhs || !rhs)
+        return nullptr;
+
     llvm::Value* lVal = lhs->codegen(ctx);
     llvm::Value* rVal = rhs->codegen(ctx);
     if (!lVal || !rVal)

@@ -12,6 +12,8 @@ CallStmtAST::CallStmtAST(SourceLocation loc, std::string name, std::vector<UPtrE
 llvm::Value* CallStmtAST::codegen(CodegenContext& ctx) {
     std::vector<llvm::Value*> argsV;
     for (const auto& arg : args) {
+        if (!arg)
+            return nullptr;
         llvm::Value* argVal = arg->codegen(ctx);
         if (!argVal)
             return nullptr;

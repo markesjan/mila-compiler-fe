@@ -10,7 +10,14 @@ namespace milan {
 ExitStmtAST::ExitStmtAST(SourceLocation loc) : StmtAST(loc) {}
 
 llvm::Value* ExitStmtAST::codegen(CodegenContext& ctx) {
-    llvm::Function* callerFunc = ctx.builder.GetInsertBlock()->getParent();
+    auto* insertBlock = ctx.builder.GetInsertBlock();
+    if (!insertBlock)
+        return nullptr;
+
+    llvm::Function* callerFunc = insertBlock->getParent();
+    if (!callerFunc)
+        return nullptr;
+
     llvm::Type* retType = callerFunc->getReturnType();
 
     if (retType->isVoidTy()) {

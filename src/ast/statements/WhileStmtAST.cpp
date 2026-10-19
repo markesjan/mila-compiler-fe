@@ -19,6 +19,9 @@ llvm::Value* WhileStmtAST::codegen(CodegenContext& ctx) {
     ctx.builder.CreateBr(condBlock);
     ctx.builder.SetInsertPoint(condBlock);
 
+    if (!cond)
+        return nullptr;
+
     llvm::Value* condVal = cond->codegen(ctx);
     if (!condVal)
         return nullptr;
@@ -28,7 +31,7 @@ llvm::Value* WhileStmtAST::codegen(CodegenContext& ctx) {
     ctx.builder.SetInsertPoint(loopBlock);
 
     LoopGuard loopGuard(ctx.loops, afterBlock, condBlock);
-    if (!loopStmt->codegen(ctx))
+    if (loopStmt && !loopStmt->codegen(ctx))
         return nullptr;
 
     ctx.builder.CreateBr(condBlock);

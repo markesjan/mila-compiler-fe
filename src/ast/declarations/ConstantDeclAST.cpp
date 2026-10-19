@@ -6,6 +6,9 @@ ConstantDeclAST::ConstantDeclAST(SourceLocation loc, std::string name, UPtrExpr 
     : DeclAST(loc), name(std::move(name)), val(std::move(val)) {}
 
 llvm::Value* ConstantDeclAST::codegen(CodegenContext& ctx) {
+    if (!val)
+        return nullptr;
+
     llvm::Value* constVal = val->codegen(ctx);
     if (!constVal)
         return nullptr;

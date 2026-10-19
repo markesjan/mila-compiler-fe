@@ -17,6 +17,9 @@ IfStmtAST::IfStmtAST(SourceLocation loc, UPtrExpr cond, UPtrStmt thenStmt, UPtrS
       elseStmt(std::move(elseStmt)) {}
 
 llvm::Value* IfStmtAST::codegen(CodegenContext& ctx) {
+    if (!cond)
+        return nullptr;
+
     llvm::Value* condVal = cond->codegen(ctx);
     if (!condVal)
         return nullptr;
@@ -29,7 +32,7 @@ llvm::Value* IfStmtAST::codegen(CodegenContext& ctx) {
     ctx.builder.CreateCondBr(condVal, thenBlock, elseBlock);
 
     ctx.builder.SetInsertPoint(thenBlock);
-    if (!thenStmt->codegen(ctx))
+    if (thenStmt && !thenStmt->codegen(ctx))
         return nullptr;
     ctx.builder.CreateBr(mergeBlock);
 

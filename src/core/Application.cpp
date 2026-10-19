@@ -8,6 +8,7 @@
 #include <llvm/Support/raw_ostream.h>
 
 #include "CodegenContext.hpp"
+#include "Diagnostic.hpp"
 #include "Parser.hpp"
 #include "Program.hpp"
 
@@ -38,7 +39,7 @@ int Application::run() {
 int Application::run(std::istream& input) {
     Parser parser(input);
     auto program = parser.parse();
-    if (!program)
+    if (!program || Diagnostic::hasErrors())
         return 1;
 
     setupBuiltins();

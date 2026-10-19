@@ -82,10 +82,13 @@ llvm::Value* FunctionDeclAST::codegen(CodegenContext& ctx) {
     llvm::AllocaInst* retAlloca = ctx.builder.CreateAlloca(llvmRetType, nullptr, name);
     ctx.symbols.insert(name, retType, retAlloca);
 
-    for (const auto& decl : localDecls)
-        decl->codegen(ctx);
+    for (const auto& decl : localDecls) {
+        if (decl)
+            decl->codegen(ctx);
+    }
 
-    body->codegen(ctx);
+    if (body)
+        body->codegen(ctx);
 
     if (!ctx.builder.GetInsertBlock()->getTerminator()) {
         llvm::Value* retVal = ctx.builder.CreateLoad(llvmRetType, retAlloca, "retVal");

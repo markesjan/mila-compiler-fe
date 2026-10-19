@@ -6,6 +6,9 @@ UnaryOpExprAST::UnaryOpExprAST(SourceLocation loc, TokenKind op, UPtrExpr expr)
     : ExprAST(loc), op(op), expr(std::move(expr)) {}
 
 llvm::Value* UnaryOpExprAST::codegen(CodegenContext& ctx) {
+    if (!expr)
+        return nullptr;
+
     llvm::Value* operandVal = expr->codegen(ctx);
     if (!operandVal)
         return nullptr;

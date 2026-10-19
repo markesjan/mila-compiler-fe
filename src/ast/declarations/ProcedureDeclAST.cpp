@@ -76,10 +76,13 @@ llvm::Value* ProcedureDeclAST::codegen(CodegenContext& ctx) {
         }
     }
 
-    for (const auto& decl : localDecls)
-        decl->codegen(ctx);
+    for (const auto& decl : localDecls) {
+        if (decl)
+            decl->codegen(ctx);
+    }
 
-    body->codegen(ctx);
+    if (body)
+        body->codegen(ctx);
 
     if (!ctx.builder.GetInsertBlock()->getTerminator())
         ctx.builder.CreateRetVoid();
