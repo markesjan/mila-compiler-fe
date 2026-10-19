@@ -37,6 +37,9 @@ private:
 
     std::vector<UPtrDecl> parseConstSection();
     std::vector<UPtrDecl> parseVarSection();
+    std::vector<UPtrDecl> parseParameters();
+    UPtrDecl parseFunction();
+    UPtrDecl parseProcedure();
 
     UPtrStmt parseBlock();
     std::vector<UPtrStmt> parseStatements();

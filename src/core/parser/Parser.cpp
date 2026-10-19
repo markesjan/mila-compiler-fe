@@ -66,13 +66,24 @@ std::unique_ptr<Program> Parser::parseProgram() {
         return nullptr;
 
     std::vector<UPtrDecl> decls;
-    while (currTok.is(TokenKind::Const) || currTok.is(TokenKind::Var)) {
+    while (currTok.is(TokenKind::Const) || currTok.is(TokenKind::Var) ||
+           currTok.is(TokenKind::Function) || currTok.is(TokenKind::Procedure)) {
         if (currTok.is(TokenKind::Const)) {
             auto constDecls = parseConstSection();
             std::ranges::move(constDecls, std::back_inserter(decls));
         } else if (currTok.is(TokenKind::Var)) {
             auto varDecls = parseVarSection();
             std::ranges::move(varDecls, std::back_inserter(decls));
+        } else if (currTok.is(TokenKind::Function)) {
+            auto fnDecl = parseFunction();
+            if (!fnDecl)
+                return nullptr;
+            decls.push_back(std::move(fnDecl));
+        } else if (currTok.is(TokenKind::Procedure)) {
+            auto procDecl = parseProcedure();
+            if (!procDecl)
+                return nullptr;
+            decls.push_back(std::move(procDecl));
         }
     }
 

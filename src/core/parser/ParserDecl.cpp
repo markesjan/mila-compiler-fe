@@ -6,6 +6,9 @@
 
 #include "ConstantDeclAST.hpp"
 #include "Diagnostic.hpp"
+#include "FunctionDeclAST.hpp"
+#include "ParameterDeclAST.hpp"
+#include "ProcedureDeclAST.hpp"
 #include "VariableDeclAST.hpp"
 
 namespace milan {
@@ -147,6 +150,170 @@ std::vector<UPtrDecl> Parser::parseVarSection() {
     }
 
     return decls;
+}
+
+std::vector<UPtrDecl> Parser::parseParameters() {
+    std::vector<UPtrDecl> params;
+
+    if (!expect(TokenKind::LParen, "parameters"))
+        return {};
+
+    if (currTok.is(TokenKind::RParen)) {
+        getNextToken();
+        return {};
+    }
+
+    while (true) {
+        SourceLocation loc = currTok.location;
+
+        if (currTok.isNot(TokenKind::Identifier)) {
+            Diagnostic::error(currTok.location, "Expected parameter identifier");
+            return {};
+        }
+
+        std::vector<std::string> names;
+        names.push_back(currTok.text);
+        getNextToken();
+
+        while (match(TokenKind::Comma)) {
+            if (currTok.isNot(TokenKind::Identifier)) {
+                Diagnostic::error(currTok.location,
+                                  "Expected identifier after ',' in parameter list");
+                return {};
+            }
+            names.push_back(currTok.text);
+            getNextToken();
+        }
+
+        if (!expect(TokenKind::Colon, "parameter type"))
+            return {};
+
+        auto typeOpt = parseType();
+        if (!typeOpt)
+            return {};
+
+        params.push_back(std::make_unique<ParameterDeclAST>(loc, std::move(names), *typeOpt));
+
+        if (currTok.is(TokenKind::RParen))
+            break;
+
+        if (!expect(TokenKind::Semicolon, "parameter list"))
+            return {};
+    }
+
+    if (!expect(TokenKind::RParen, "parameters"))
+        return {};
+
+    return params;
+}
+
+UPtrDecl Parser::parseFunction() {
+    SourceLocation loc = currTok.location;
+
+    if (!expect(TokenKind::Function, "function declaration"))
+        return nullptr;
+
+    if (currTok.isNot(TokenKind::Identifier)) {
+        Diagnostic::error(currTok.location, "Expected function name");
+        return nullptr;
+    }
+
+    std::string name = currTok.text;
+    getNextToken();
+
+    std::vector<UPtrDecl> params;
+    if (currTok.is(TokenKind::LParen))
+        params = parseParameters();
+
+    if (!expect(TokenKind::Colon, "function return type"))
+        return nullptr;
+
+    auto retType = parseType();
+    if (!retType)
+        return nullptr;
+
+    if (!expect(TokenKind::Semicolon, "function header"))
+        return nullptr;
+
+    if (match(TokenKind::Forward)) {
+        if (!expect(TokenKind::Semicolon, "forward declaration"))
+            return nullptr;
+
+        return std::make_unique<FunctionDeclAST>(loc, std::move(name), *retType, std::move(params),
+                                                 std::vector<UPtrDecl>{}, nullptr);
+    }
+
+    std::vector<UPtrDecl> localDecls;
+    while (currTok.is(TokenKind::Const) || currTok.is(TokenKind::Var)) {
+        if (currTok.is(TokenKind::Const)) {
+            auto constDecls = parseConstSection();
+            std::ranges::move(constDecls, std::back_inserter(localDecls));
+        } else if (currTok.is(TokenKind::Var)) {
+            auto varDecls = parseVarSection();
+            std::ranges::move(varDecls, std::back_inserter(localDecls));
+        }
+    }
+
+    UPtrStmt body = parseBlock();
+    if (!body)
+        return nullptr;
+
+    if (!expect(TokenKind::Semicolon, "function declaration"))
+        return nullptr;
+
+    return std::make_unique<FunctionDeclAST>(loc, std::move(name), *retType, std::move(params),
+                                             std::move(localDecls), std::move(body));
+}
+
+UPtrDecl Parser::parseProcedure() {
+    SourceLocation loc = currTok.location;
+
+    if (!expect(TokenKind::Procedure, "procedure declaration"))
+        return nullptr;
+
+    if (currTok.isNot(TokenKind::Identifier)) {
+        Diagnostic::error(currTok.location, "Expected procedure name");
+        return nullptr;
+    }
+
+    std::string name = currTok.text;
+    getNextToken();
+
+    std::vector<UPtrDecl> params;
+    if (currTok.is(TokenKind::LParen))
+        params = parseParameters();
+
+    if (!expect(TokenKind::Semicolon, "procedure header"))
+        return nullptr;
+
+    if (match(TokenKind::Forward)) {
+        if (!expect(TokenKind::Semicolon, "forward declaration"))
+            return nullptr;
+
+        return std::make_unique<ProcedureDeclAST>(loc, std::move(name), std::move(params),
+                                                  std::vector<UPtrDecl>{}, nullptr);
+    }
+
+    std::vector<UPtrDecl> localDecls;
+    while (currTok.is(TokenKind::Const) || currTok.is(TokenKind::Var)) {
+        if (currTok.is(TokenKind::Const)) {
+            auto constDecls = parseConstSection();
+            std::ranges::move(constDecls, std::back_inserter(localDecls));
+        } else if (currTok.is(TokenKind::Var)) {
+            auto varDecls = parseVarSection();
+            std::ranges::move(varDecls, std::back_inserter(localDecls));
+        }
+    }
+
+    UPtrStmt body = parseBlock();
+    if (!body)
+        return nullptr;
+
+    if (!expect(TokenKind::Semicolon, "procedure declaration"))
+        return nullptr;
+
+    return std::make_unique<ProcedureDeclAST>(loc, std::move(name), std::move(params),
+                                              std::move(localDecls), std::move(body));
 }
 
 } // namespace milan
