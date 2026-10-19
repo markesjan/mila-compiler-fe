@@ -1,0 +1,22 @@
+program power;
+
+function pow(base: integer; exp: integer): integer;
+var res: integer;
+begin
+    res := 1;
+    while exp > 0 do
+    begin
+        if (exp mod 2) = 1 then
+            res := res * base;
+        base := base * base;
+        exp := exp div 2;
+    end;
+    pow := res;
+end;
+
+begin
+    writeln(pow(2, 0));
+    writeln(pow(2, 10));
+    writeln(pow(3, 4));
+    writeln(pow(5, 3));
+end.
