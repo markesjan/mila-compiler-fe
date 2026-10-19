@@ -16,8 +16,14 @@ llvm::Value* ExitStmtAST::codegen(CodegenContext& ctx) {
     if (retType->isVoidTy()) {
         ctx.builder.CreateRetVoid();
     } else {
-        llvm::Value* defaultRet = llvm::Constant::getNullValue(retType);
-        ctx.builder.CreateRet(defaultRet);
+        llvm::Value* retVal = nullptr;
+
+        if (auto* retSym = ctx.symbols.lookup(callerFunc->getName()))
+            retVal = ctx.builder.CreateLoad(retType, retSym->value, "exitVal");
+        else
+            retVal = llvm::Constant::getNullValue(retType);
+
+        ctx.builder.CreateRet(retVal);
     }
 
     llvm::BasicBlock* deadBlock =
