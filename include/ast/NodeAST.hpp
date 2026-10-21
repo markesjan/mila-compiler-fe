@@ -16,7 +16,7 @@ public:
     virtual ~NodeAST() = default;
     virtual llvm::Value* codegen(CodegenContext& ctx) = 0;
 
-    SourceLocation getLocation() const noexcept { return loc; }
+    SourceLocation getLocation() const noexcept;
 
 protected:
     SourceLocation loc;
