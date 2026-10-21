@@ -1,3 +1,8 @@
+/**
+ * @file DeclAST.hpp
+ * @brief Base class for all declaration nodes in the abstract syntax tree.
+ */
+
 #pragma once
 
 #include <memory>

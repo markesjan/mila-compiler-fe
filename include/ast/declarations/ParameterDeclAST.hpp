@@ -1,3 +1,8 @@
+/**
+ * @file ParameterDeclAST.hpp
+ * @brief AST node representing formal parameters in function and procedure signatures.
+ */
+
 #pragma once
 
 #include <string>

@@ -1,3 +1,8 @@
+/**
+ * @file TypeImpl.hpp
+ * @brief Polymorphic base interface defining common operations for compiler type implementations.
+ */
+
 #pragma once
 
 #include <string>

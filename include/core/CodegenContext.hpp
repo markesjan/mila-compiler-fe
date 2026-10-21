@@ -1,3 +1,9 @@
+/**
+ * @file CodegenContext.hpp
+ * @brief Shared context holding LLVM modules, builder, symbol table, and loop targets during code
+ * generation.
+ */
+
 #pragma once
 
 #include <map>

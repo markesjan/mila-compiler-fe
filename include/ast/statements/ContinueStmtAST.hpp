@@ -1,3 +1,8 @@
+/**
+ * @file ContinueStmtAST.hpp
+ * @brief AST node representing loop iteration skip statements (continue).
+ */
+
 #pragma once
 
 #include "StmtAST.hpp"

@@ -1,3 +1,9 @@
+/**
+ * @file Token.hpp
+ * @brief Lexical token structure containing its kind, source location, and associated literal
+ * values.
+ */
+
 #pragma once
 
 #include <cstdint>

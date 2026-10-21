@@ -1,3 +1,8 @@
+/**
+ * @file UnaryOpExprAST.hpp
+ * @brief AST node representing unary expressions such as negation and logical not.
+ */
+
 #pragma once
 
 #include <cstdint>

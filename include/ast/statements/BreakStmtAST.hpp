@@ -1,3 +1,8 @@
+/**
+ * @file BreakStmtAST.hpp
+ * @brief AST node representing loop termination statements (break).
+ */
+
 #pragma once
 
 #include "StmtAST.hpp"

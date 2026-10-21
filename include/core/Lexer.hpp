@@ -1,3 +1,8 @@
+/**
+ * @file Lexer.hpp
+ * @brief Lexical analyzer converting source character streams into tokens for the parser.
+ */
+
 #pragma once
 
 #include <iostream>

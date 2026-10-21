@@ -1,3 +1,8 @@
+/**
+ * @file AssignStmtAST.hpp
+ * @brief AST node representing assignments to scalar variables or array elements.
+ */
+
 #pragma once
 
 #include <string>

@@ -1,3 +1,8 @@
+/**
+ * @file EmptyStmtAST.hpp
+ * @brief AST node representing an empty statement.
+ */
+
 #pragma once
 
 #include "StmtAST.hpp"

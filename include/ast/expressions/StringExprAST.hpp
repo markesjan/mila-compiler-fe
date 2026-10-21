@@ -1,3 +1,8 @@
+/**
+ * @file StringExprAST.hpp
+ * @brief AST node representing string literals used for output operations.
+ */
+
 #pragma once
 
 #include <string>

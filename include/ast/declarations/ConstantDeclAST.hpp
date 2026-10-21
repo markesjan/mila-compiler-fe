@@ -1,3 +1,8 @@
+/**
+ * @file ConstantDeclAST.hpp
+ * @brief AST node representing a named constant declaration evaluated at compile time.
+ */
+
 #pragma once
 
 #include <string>

@@ -1,3 +1,8 @@
+/**
+ * @file BinaryOpExprAST.hpp
+ * @brief AST node representing binary operations with automatic numeric type promotion.
+ */
+
 #pragma once
 
 #include <cstdint>

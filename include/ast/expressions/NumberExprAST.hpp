@@ -1,3 +1,8 @@
+/**
+ * @file NumberExprAST.hpp
+ * @brief AST node representing 32-bit integer literals.
+ */
+
 #pragma once
 
 #include <cstdint>

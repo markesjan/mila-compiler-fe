@@ -1,3 +1,8 @@
+/**
+ * @file VariableDeclAST.hpp
+ * @brief AST node representing local or global variable declarations and their memory allocation.
+ */
+
 #pragma once
 
 #include <string>

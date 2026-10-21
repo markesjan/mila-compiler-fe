@@ -1,3 +1,8 @@
+/**
+ * @file ProcedureDeclAST.hpp
+ * @brief AST node representing procedure declarations with local declarations and a statement body.
+ */
+
 #pragma once
 
 #include <string>

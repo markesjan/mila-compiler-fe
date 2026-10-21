@@ -1,3 +1,8 @@
+/**
+ * @file VoidType.hpp
+ * @brief Type implementation representing the absence of a value, used for procedure returns.
+ */
+
 #pragma once
 
 #include <string>

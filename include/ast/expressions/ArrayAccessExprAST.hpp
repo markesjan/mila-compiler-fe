@@ -1,3 +1,8 @@
+/**
+ * @file ArrayAccessExprAST.hpp
+ * @brief AST node representing array element access with index offset computation.
+ */
+
 #pragma once
 
 #include <string>

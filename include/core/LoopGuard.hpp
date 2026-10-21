@@ -1,3 +1,8 @@
+/**
+ * @file LoopGuard.hpp
+ * @brief RAII guard for managing loop jump targets (break and continue) on the loop stack.
+ */
+
 #pragma once
 
 namespace llvm {

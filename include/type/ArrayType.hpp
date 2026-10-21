@@ -1,3 +1,9 @@
+/**
+ * @file ArrayType.hpp
+ * @brief Type implementation representing one-dimensional arrays with arbitrary lower and upper
+ * bounds.
+ */
+
 #pragma once
 
 #include <cstdint>

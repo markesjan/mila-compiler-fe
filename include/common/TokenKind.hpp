@@ -1,3 +1,8 @@
+/**
+ * @file TokenKind.hpp
+ * @brief Enumeration representing all lexical token kinds recognized by the Mila compiler.
+ */
+
 #pragma once
 
 #include <cstdint>

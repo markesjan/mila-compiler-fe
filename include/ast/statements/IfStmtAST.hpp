@@ -1,3 +1,8 @@
+/**
+ * @file IfStmtAST.hpp
+ * @brief AST node representing conditional branching statements (if-then-else).
+ */
+
 #pragma once
 
 #include "ExprAST.hpp"

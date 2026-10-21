@@ -1,3 +1,8 @@
+/**
+ * @file ScopeGuard.hpp
+ * @brief RAII guard for managing nested lexical scopes in the symbol table.
+ */
+
 #pragma once
 
 namespace milan {

@@ -1,3 +1,9 @@
+/**
+ * @file FunctionDeclAST.hpp
+ * @brief AST node representing function declarations with a return type, local declarations, and a
+ * body.
+ */
+
 #pragma once
 
 #include <string>

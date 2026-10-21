@@ -1,3 +1,8 @@
+/**
+ * @file ExitStmtAST.hpp
+ * @brief AST node representing early exit from functions and procedures.
+ */
+
 #pragma once
 
 #include "StmtAST.hpp"

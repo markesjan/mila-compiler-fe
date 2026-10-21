@@ -1,3 +1,8 @@
+/**
+ * @file Diagnostic.hpp
+ * @brief Compiler diagnostic and error reporting system with colored terminal output.
+ */
+
 #pragma once
 
 #include <cstddef>

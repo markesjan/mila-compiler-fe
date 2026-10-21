@@ -1,3 +1,9 @@
+/**
+ * @file SymbolTable.hpp
+ * @brief Hierarchical symbol table supporting nested lexical scopes for variable and function
+ * lookup.
+ */
+
 #pragma once
 
 #include <string>

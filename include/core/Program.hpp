@@ -1,3 +1,9 @@
+/**
+ * @file Program.hpp
+ * @brief Root representation of a Mila program orchestrating global declarations and the main
+ * execution block.
+ */
+
 #pragma once
 
 #include <string>

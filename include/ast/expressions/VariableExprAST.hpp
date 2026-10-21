@@ -1,3 +1,8 @@
+/**
+ * @file VariableExprAST.hpp
+ * @brief AST node representing variable and constant identifier references.
+ */
+
 #pragma once
 
 #include <string>

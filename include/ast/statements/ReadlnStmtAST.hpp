@@ -1,3 +1,8 @@
+/**
+ * @file ReadlnStmtAST.hpp
+ * @brief AST node representing standard input read operations.
+ */
+
 #pragma once
 
 #include <string>

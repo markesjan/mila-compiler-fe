@@ -1,3 +1,8 @@
+/**
+ * @file LoopStack.hpp
+ * @brief Stack tracking active nested loops and their corresponding LLVM break and continue blocks.
+ */
+
 #pragma once
 
 #include <vector>

@@ -1,3 +1,8 @@
+/**
+ * @file Parser.hpp
+ * @brief Recursive descent parser producing an abstract syntax tree (AST) from a token stream.
+ */
+
 #pragma once
 
 #include <iostream>

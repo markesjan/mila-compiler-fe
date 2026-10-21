@@ -1,3 +1,8 @@
+/**
+ * @file IntegerType.hpp
+ * @brief Type implementation representing 32-bit signed integer values.
+ */
+
 #pragma once
 
 #include <string>

@@ -1,3 +1,8 @@
+/**
+ * @file ForStmtAST.hpp
+ * @brief AST node representing for loops with increment (to) or decrement (downto).
+ */
+
 #pragma once
 
 #include <cstdint>

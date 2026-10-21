@@ -1,3 +1,8 @@
+/**
+ * @file BooleanType.hpp
+ * @brief Type implementation representing 1-bit boolean values.
+ */
+
 #pragma once
 
 #include <string>

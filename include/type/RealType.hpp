@@ -1,3 +1,8 @@
+/**
+ * @file RealType.hpp
+ * @brief Type implementation representing 64-bit IEEE 754 double precision floating-point numbers.
+ */
+
 #pragma once
 
 #include <string>

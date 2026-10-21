@@ -1,3 +1,8 @@
+/**
+ * @file NodeAST.hpp
+ * @brief Abstract base class for all nodes in the abstract syntax tree.
+ */
+
 #pragma once
 
 #include "SourceLocation.hpp"

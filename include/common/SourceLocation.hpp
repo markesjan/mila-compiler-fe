@@ -1,3 +1,8 @@
+/**
+ * @file SourceLocation.hpp
+ * @brief Source location representation (line and column) for tokens and AST nodes.
+ */
+
 #pragma once
 
 #include <compare>

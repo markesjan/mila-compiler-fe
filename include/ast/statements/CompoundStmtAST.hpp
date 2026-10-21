@@ -1,3 +1,8 @@
+/**
+ * @file CompoundStmtAST.hpp
+ * @brief AST node representing a sequential block of statements delimited by begin and end.
+ */
+
 #pragma once
 
 #include <vector>

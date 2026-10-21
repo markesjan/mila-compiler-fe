@@ -1,3 +1,9 @@
+/**
+ * @file Type.hpp
+ * @brief Value-type handle wrapping type implementations with flyweight instances and
+ * concept-constrained casting.
+ */
+
 #pragma once
 
 #include <concepts>

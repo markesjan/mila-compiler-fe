@@ -1,3 +1,9 @@
+/**
+ * @file Application.hpp
+ * @brief Main compiler driver application orchestrating parsing, semantic validation, and code
+ * generation.
+ */
+
 #pragma once
 
 #include <iostream>

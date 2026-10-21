@@ -1,3 +1,8 @@
+/**
+ * @file CallExprAST.hpp
+ * @brief AST node representing function calls returning a value.
+ */
+
 #pragma once
 
 #include <string>

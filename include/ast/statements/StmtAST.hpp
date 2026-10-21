@@ -1,3 +1,8 @@
+/**
+ * @file StmtAST.hpp
+ * @brief Base class for all executable statement nodes in the abstract syntax tree.
+ */
+
 #pragma once
 
 #include <memory>

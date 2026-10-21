@@ -1,3 +1,8 @@
+/**
+ * @file RealExprAST.hpp
+ * @brief AST node representing 64-bit floating-point literals.
+ */
+
 #pragma once
 
 #include "ExprAST.hpp"

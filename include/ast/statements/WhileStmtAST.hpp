@@ -1,3 +1,8 @@
+/**
+ * @file WhileStmtAST.hpp
+ * @brief AST node representing pre-condition while loops.
+ */
+
 #pragma once
 
 #include "ExprAST.hpp"
