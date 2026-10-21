@@ -14,6 +14,12 @@ class NodeAST {
 public:
     explicit NodeAST(SourceLocation loc);
     virtual ~NodeAST() = default;
+
+    NodeAST(const NodeAST&) = delete;
+    NodeAST& operator=(const NodeAST&) = delete;
+    NodeAST(NodeAST&&) = default;
+    NodeAST& operator=(NodeAST&&) = default;
+
     virtual llvm::Value* codegen(CodegenContext& ctx) = 0;
 
     SourceLocation getLocation() const noexcept;

@@ -59,7 +59,7 @@ bool Diagnostic::hasErrors() {
     return errCnt > 0;
 }
 
-int Diagnostic::getErrorCount() {
+std::size_t Diagnostic::getErrorCount() {
     return errCnt;
 }
 

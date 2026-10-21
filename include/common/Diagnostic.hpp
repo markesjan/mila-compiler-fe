@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <string_view>
 
 #include "SourceLocation.hpp"
@@ -18,11 +19,11 @@ public:
     static void note(SourceLocation loc, std::string_view msg);
 
     static bool hasErrors();
-    static int getErrorCount();
+    static std::size_t getErrorCount();
     static void reset();
 
 private:
-    inline static int errCnt = 0;
+    inline static std::size_t errCnt = 0;
 };
 
 } // namespace milan

@@ -1,6 +1,7 @@
 #include "Parser.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <iterator>
 #include <memory>
 #include <optional>
@@ -43,7 +44,7 @@ std::optional<Type> Parser::parseType() {
         if (!expect(TokenKind::LBracket, "array declaration"))
             return std::nullopt;
 
-        auto parseBound = [&]() -> std::optional<int> {
+        auto parseBound = [&]() -> std::optional<std::int32_t> {
             bool isNeg = false;
             if (currTok.is(TokenKind::Minus)) {
                 isNeg = true;
@@ -55,7 +56,7 @@ std::optional<Type> Parser::parseType() {
                 return std::nullopt;
             }
 
-            int val = currTok.numberValue;
+            std::int32_t val = currTok.numberValue;
             if (isNeg)
                 val = -val;
 

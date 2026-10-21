@@ -24,7 +24,7 @@ bool SymbolTable::insert(Symbol symbol) {
 }
 
 bool SymbolTable::insert(std::string name, Type type, llvm::Value* value, bool isConstant) {
-    return insert(Symbol{std::move(name), type, value, isConstant});
+    return insert(Symbol{std::move(name), std::move(type), value, isConstant});
 }
 
 Symbol* SymbolTable::lookup(std::string_view name) {

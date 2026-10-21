@@ -3,11 +3,12 @@
 #include <llvm/IR/DerivedTypes.h>
 
 #include <format>
+#include <utility>
 
 namespace milan {
 
 ArrayType::ArrayType(std::int32_t low, std::int32_t high, Type elemType)
-    : low(low), high(high), elemType(elemType) {}
+    : low(low), high(high), elemType(std::move(elemType)) {}
 
 llvm::Type* ArrayType::toLlvmType(llvm::LLVMContext& ctx) const {
     llvm::Type* elem = elemType.toLlvmType(ctx);
