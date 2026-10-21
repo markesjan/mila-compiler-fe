@@ -1,7 +1,11 @@
 #include "ContinueStmtAST.hpp"
 
+#include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/Constants.h>
-#include <llvm/IR/Function.h>
+#include <llvm/IR/IRBuilder.h>
+
+#include "CodegenContext.hpp"
+#include "LoopStack.hpp"
 
 namespace milan {
 

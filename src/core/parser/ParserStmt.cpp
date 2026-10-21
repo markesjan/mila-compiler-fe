@@ -6,8 +6,26 @@
 #include <utility>
 #include <vector>
 
-#include "AllNodes.hpp"
+#include "AssignStmtAST.hpp"
+#include "BinaryOpExprAST.hpp"
+#include "BreakStmtAST.hpp"
+#include "CallStmtAST.hpp"
+#include "CompoundStmtAST.hpp"
+#include "ContinueStmtAST.hpp"
 #include "Diagnostic.hpp"
+#include "EmptyStmtAST.hpp"
+#include "ExitStmtAST.hpp"
+#include "ExprAST.hpp"
+#include "ForStmtAST.hpp"
+#include "IfStmtAST.hpp"
+#include "NumberExprAST.hpp"
+#include "ReadlnStmtAST.hpp"
+#include "SourceLocation.hpp"
+#include "StmtAST.hpp"
+#include "Token.hpp"
+#include "TokenKind.hpp"
+#include "VariableExprAST.hpp"
+#include "WhileStmtAST.hpp"
 
 namespace milan {
 

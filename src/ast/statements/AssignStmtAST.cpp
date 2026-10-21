@@ -1,7 +1,18 @@
 #include "AssignStmtAST.hpp"
 
+#include <utility>
+
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/Type.h>
+#include <llvm/IR/Value.h>
+#include <llvm/Support/Casting.h>
+
 #include "ArrayType.hpp"
+#include "CodegenContext.hpp"
 #include "RealType.hpp"
+#include "SymbolTable.hpp"
 
 namespace milan {
 

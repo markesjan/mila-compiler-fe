@@ -1,11 +1,12 @@
 #pragma once
 
-#include <memory>
+#include <cstdint>
 
 #include "ExprAST.hpp"
-#include "TokenKind.hpp"
 
 namespace milan {
+
+enum class TokenKind : std::uint8_t;
 
 class BinaryOpExprAST : public ExprAST {
 public:

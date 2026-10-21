@@ -1,7 +1,15 @@
 #include "VariableDeclAST.hpp"
 
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Constants.h>
 #include <llvm/IR/Function.h>
-#include <llvm/IR/Type.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Instructions.h>
+
+#include <utility>
+
+#include "CodegenContext.hpp"
+#include "SymbolTable.hpp"
 
 namespace milan {
 

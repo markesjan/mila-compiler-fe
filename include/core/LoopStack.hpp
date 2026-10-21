@@ -2,7 +2,9 @@
 
 #include <vector>
 
-#include <llvm/IR/BasicBlock.h>
+namespace llvm {
+class BasicBlock;
+} // namespace llvm
 
 namespace milan {
 

@@ -1,5 +1,8 @@
 #include "BooleanType.hpp"
 
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Type.h>
+
 namespace milan {
 
 llvm::Type* BooleanType::toLlvmType(llvm::LLVMContext& ctx) const {

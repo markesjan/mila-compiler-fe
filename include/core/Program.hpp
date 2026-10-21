@@ -1,14 +1,14 @@
 #pragma once
 
-#include <memory>
 #include <string>
 #include <vector>
 
-#include "CodegenContext.hpp"
 #include "DeclAST.hpp"
 #include "StmtAST.hpp"
 
 namespace milan {
+
+struct CodegenContext;
 
 class Program {
 public:

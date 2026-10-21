@@ -1,9 +1,15 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 #include "Type.hpp"
 #include "TypeImpl.hpp"
+
+namespace llvm {
+class LLVMContext;
+class Type;
+} // namespace llvm
 
 namespace milan {
 

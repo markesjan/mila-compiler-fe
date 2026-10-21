@@ -1,5 +1,7 @@
 #include "VoidType.hpp"
 
+#include <llvm/IR/Type.h>
+
 namespace milan {
 
 llvm::Type* VoidType::toLlvmType(llvm::LLVMContext& ctx) const {

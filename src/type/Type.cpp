@@ -1,9 +1,12 @@
 #include "Type.hpp"
 
+#include <llvm/IR/Type.h>
+
 #include "ArrayType.hpp"
 #include "BooleanType.hpp"
 #include "IntegerType.hpp"
 #include "RealType.hpp"
+#include "TypeImpl.hpp"
 #include "VoidType.hpp"
 
 namespace milan {

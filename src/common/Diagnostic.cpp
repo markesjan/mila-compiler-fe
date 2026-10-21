@@ -2,6 +2,8 @@
 
 #include <print>
 
+#include "SourceLocation.hpp"
+
 namespace milan {
 
 void Diagnostic::log(LogLevel level, SourceLocation loc, std::string_view msg) {

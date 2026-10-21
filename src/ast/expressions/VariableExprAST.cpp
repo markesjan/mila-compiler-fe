@@ -1,6 +1,13 @@
 #include "VariableExprAST.hpp"
 
+#include <utility>
+
+#include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Instructions.h>
+#include <llvm/Support/Casting.h>
+
+#include "CodegenContext.hpp"
+#include "SymbolTable.hpp"
 
 namespace milan {
 

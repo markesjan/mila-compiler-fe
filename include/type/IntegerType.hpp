@@ -1,6 +1,13 @@
 #pragma once
 
+#include <string>
+
 #include "TypeImpl.hpp"
+
+namespace llvm {
+class LLVMContext;
+class Type;
+} // namespace llvm
 
 namespace milan {
 

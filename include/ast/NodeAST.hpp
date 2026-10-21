@@ -1,11 +1,14 @@
 #pragma once
 
-#include <llvm/IR/Value.h>
-
-#include "CodegenContext.hpp"
 #include "SourceLocation.hpp"
 
+namespace llvm {
+class Value;
+} // namespace llvm
+
 namespace milan {
+
+struct CodegenContext;
 
 class NodeAST {
 public:

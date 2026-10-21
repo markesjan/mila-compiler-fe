@@ -1,8 +1,13 @@
 #include "WhileStmtAST.hpp"
 
+#include <utility>
+
+#include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/Function.h>
+#include <llvm/IR/IRBuilder.h>
 
+#include "CodegenContext.hpp"
 #include "LoopGuard.hpp"
 
 namespace milan {

@@ -7,11 +7,12 @@
 #include <string_view>
 #include <vector>
 
-#include "Diagnostic.hpp"
+#include "DeclAST.hpp"
 #include "ExprAST.hpp"
 #include "Lexer.hpp"
 #include "Program.hpp"
 #include "StmtAST.hpp"
+#include "Token.hpp"
 #include "Type.hpp"
 
 namespace milan {

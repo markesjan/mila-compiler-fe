@@ -1,5 +1,17 @@
 #include "Program.hpp"
 
+#include <memory>
+#include <utility>
+
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Type.h>
+
+#include "CodegenContext.hpp"
+
 namespace milan {
 
 Program::Program(std::string name, std::vector<UPtrDecl> globalDecls, UPtrStmt mainBlock)

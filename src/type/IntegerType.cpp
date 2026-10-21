@@ -1,6 +1,7 @@
 #include "IntegerType.hpp"
 
 #include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Type.h>
 
 namespace milan {
 

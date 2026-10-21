@@ -1,5 +1,11 @@
 #include "StringExprAST.hpp"
 
+#include <utility>
+
+#include <llvm/IR/IRBuilder.h>
+
+#include "CodegenContext.hpp"
+
 namespace milan {
 
 StringExprAST::StringExprAST(SourceLocation loc, std::string val)

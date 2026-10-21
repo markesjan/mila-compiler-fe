@@ -5,8 +5,19 @@
 #include <utility>
 #include <vector>
 
-#include "AllNodes.hpp"
-#include "Diagnostic.hpp"
+#include "ArrayAccessExprAST.hpp"
+#include "BinaryOpExprAST.hpp"
+#include "BooleanExprAST.hpp"
+#include "CallExprAST.hpp"
+#include "ExprAST.hpp"
+#include "NumberExprAST.hpp"
+#include "RealExprAST.hpp"
+#include "SourceLocation.hpp"
+#include "StringExprAST.hpp"
+#include "Token.hpp"
+#include "TokenKind.hpp"
+#include "UnaryOpExprAST.hpp"
+#include "VariableExprAST.hpp"
 
 namespace milan {
 

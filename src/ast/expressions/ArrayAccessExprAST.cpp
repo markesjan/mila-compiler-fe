@@ -1,7 +1,13 @@
 #include "ArrayAccessExprAST.hpp"
 
+#include <utility>
+
+#include <llvm/IR/Constants.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Type.h>
+
+#include "CodegenContext.hpp"
+#include "SymbolTable.hpp"
 
 namespace milan {
 

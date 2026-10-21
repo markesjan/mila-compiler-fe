@@ -1,12 +1,15 @@
 #pragma once
 
-#include <llvm/IR/Value.h>
-
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
 #include "Type.hpp"
+
+namespace llvm {
+class Value;
+} // namespace llvm
 
 namespace milan {
 

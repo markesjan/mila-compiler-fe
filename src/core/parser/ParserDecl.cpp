@@ -1,14 +1,24 @@
 #include "Parser.hpp"
 
+#include <algorithm>
+#include <iterator>
+#include <memory>
 #include <optional>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "ConstantDeclAST.hpp"
+#include "DeclAST.hpp"
 #include "Diagnostic.hpp"
 #include "FunctionDeclAST.hpp"
 #include "ParameterDeclAST.hpp"
 #include "ProcedureDeclAST.hpp"
+#include "SourceLocation.hpp"
+#include "StmtAST.hpp"
+#include "Token.hpp"
+#include "TokenKind.hpp"
+#include "Type.hpp"
 #include "VariableDeclAST.hpp"
 
 namespace milan {

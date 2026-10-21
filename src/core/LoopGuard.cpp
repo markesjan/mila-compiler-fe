@@ -1,5 +1,7 @@
 #include "LoopGuard.hpp"
 
+#include "LoopStack.hpp"
+
 namespace milan {
 
 LoopGuard::LoopGuard(LoopStack& stack,

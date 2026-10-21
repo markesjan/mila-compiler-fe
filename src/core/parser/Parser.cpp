@@ -2,7 +2,12 @@
 
 #include <algorithm>
 #include <format>
+#include <iterator>
+#include <utility>
 #include <vector>
+
+#include "Diagnostic.hpp"
+#include "TokenKind.hpp"
 
 namespace milan {
 

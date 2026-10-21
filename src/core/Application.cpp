@@ -5,6 +5,9 @@
 #include <print>
 #include <vector>
 
+#include <llvm/IR/DerivedTypes.h>
+#include <llvm/IR/Function.h>
+#include <llvm/IR/Type.h>
 #include <llvm/Support/raw_ostream.h>
 
 #include "CodegenContext.hpp"

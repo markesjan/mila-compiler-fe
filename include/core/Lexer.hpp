@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "SourceLocation.hpp"
 #include "Token.hpp"
 
 namespace milan {

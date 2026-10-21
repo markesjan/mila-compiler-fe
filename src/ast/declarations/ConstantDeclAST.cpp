@@ -1,5 +1,13 @@
 #include "ConstantDeclAST.hpp"
 
+#include <llvm/IR/Constants.h>
+#include <llvm/IR/Value.h>
+
+#include <utility>
+
+#include "CodegenContext.hpp"
+#include "Type.hpp"
+
 namespace milan {
 
 ConstantDeclAST::ConstantDeclAST(SourceLocation loc, std::string name, UPtrExpr val)

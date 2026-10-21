@@ -1,8 +1,8 @@
 #pragma once
 
-#include "SymbolTable.hpp"
-
 namespace milan {
+
+class SymbolTable;
 
 class ScopeGuard {
 public:

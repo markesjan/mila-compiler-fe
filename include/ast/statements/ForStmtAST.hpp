@@ -1,13 +1,14 @@
 #pragma once
 
-#include <memory>
+#include <cstdint>
 #include <string>
 
 #include "ExprAST.hpp"
 #include "StmtAST.hpp"
-#include "TokenKind.hpp"
 
 namespace milan {
+
+enum class TokenKind : std::uint8_t;
 
 class ForStmtAST : public StmtAST {
 public:

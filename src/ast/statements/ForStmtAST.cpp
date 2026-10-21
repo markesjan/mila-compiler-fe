@@ -1,11 +1,19 @@
 #include "ForStmtAST.hpp"
 
+#include <utility>
+
+#include <llvm/IR/BasicBlock.h>
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/Function.h>
+#include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Type.h>
+#include <llvm/Support/Casting.h>
 
+#include "CodegenContext.hpp"
 #include "LoopGuard.hpp"
+#include "SymbolTable.hpp"
+#include "TokenKind.hpp"
 
 namespace milan {
 

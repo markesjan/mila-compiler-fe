@@ -1,11 +1,15 @@
 #include "Lexer.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <cstdint>
+#include <string>
+#include <string_view>
 #include <unordered_map>
 
 #include "Diagnostic.hpp"
 #include "Token.hpp"
+#include "TokenKind.hpp"
 
 namespace milan {
 

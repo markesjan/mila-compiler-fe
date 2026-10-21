@@ -1,11 +1,17 @@
 #pragma once
 
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Type.h>
-
+#include <concepts>
+#include <cstdint>
+#include <memory>
 #include <string>
+#include <utility>
 
 #include "TypeImpl.hpp"
+
+namespace llvm {
+class LLVMContext;
+class Type;
+} // namespace llvm
 
 namespace milan {
 

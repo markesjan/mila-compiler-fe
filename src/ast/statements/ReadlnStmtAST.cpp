@@ -1,9 +1,15 @@
 #include "ReadlnStmtAST.hpp"
 
+#include <utility>
+
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/Function.h>
+#include <llvm/IR/IRBuilder.h>
+#include <llvm/IR/Module.h>
 
+#include "CodegenContext.hpp"
 #include "RealType.hpp"
+#include "SymbolTable.hpp"
 
 namespace milan {
 

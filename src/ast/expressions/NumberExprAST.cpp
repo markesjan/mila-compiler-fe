@@ -3,6 +3,8 @@
 #include <llvm/IR/Constants.h>
 #include <llvm/IR/Type.h>
 
+#include "CodegenContext.hpp"
+
 namespace milan {
 
 NumberExprAST::NumberExprAST(SourceLocation loc, std::int32_t val) : ExprAST(loc), val(val) {}

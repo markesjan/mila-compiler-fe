@@ -2,9 +2,10 @@
 
 #include <string>
 
-#include <llvm/IR/DerivedTypes.h>
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Type.h>
+namespace llvm {
+class LLVMContext;
+class Type;
+} // namespace llvm
 
 namespace milan {
 

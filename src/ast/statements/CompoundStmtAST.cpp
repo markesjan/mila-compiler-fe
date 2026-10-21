@@ -1,5 +1,11 @@
 #include "CompoundStmtAST.hpp"
 
+#include <utility>
+
+#include <llvm/IR/Constants.h>
+
+#include "CodegenContext.hpp"
+
 namespace milan {
 
 CompoundStmtAST::CompoundStmtAST(SourceLocation loc, std::vector<UPtrStmt> stmts)

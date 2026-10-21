@@ -1,8 +1,12 @@
 #pragma once
 
-#include "LoopStack.hpp"
+namespace llvm {
+class BasicBlock;
+} // namespace llvm
 
 namespace milan {
+
+class LoopStack;
 
 class LoopGuard {
 public:

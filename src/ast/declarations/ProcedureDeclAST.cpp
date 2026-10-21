@@ -1,16 +1,19 @@
 #include "ProcedureDeclAST.hpp"
 
+#include <cstddef>
+#include <utility>
 #include <vector>
 
 #include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Function.h>
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Type.h>
 
 #include "CodegenContext.hpp"
-#include "Diagnostic.hpp"
 #include "ParameterDeclAST.hpp"
 #include "ScopeGuard.hpp"
+#include "SymbolTable.hpp"
 
 namespace milan {
 

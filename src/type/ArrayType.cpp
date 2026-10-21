@@ -1,5 +1,7 @@
 #include "ArrayType.hpp"
 
+#include <llvm/IR/DerivedTypes.h>
+
 #include <format>
 
 namespace milan {

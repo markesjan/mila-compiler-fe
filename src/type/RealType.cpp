@@ -1,5 +1,7 @@
 #include "RealType.hpp"
 
+#include <llvm/IR/Type.h>
+
 namespace milan {
 
 llvm::Type* RealType::toLlvmType(llvm::LLVMContext& ctx) const {
